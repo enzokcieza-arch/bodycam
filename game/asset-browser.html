@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Buscador 3D — Bodycam</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #0a0c0e; color: #ddd; font: 12px Menlo, Consolas, monospace; overflow: hidden; }
+    #view { position: fixed; right: 0; bottom: 0; width: 420px; height: 320px; z-index: 50; border: 1px solid #333; background: #111; display: none; }
+    #view.on { display: block; }
+    #view .x { position: absolute; top: 4px; right: 6px; cursor: pointer; z-index: 2; }
+    #view .n { position: absolute; left: 6px; top: 4px; z-index: 2; opacity: .8; }
+  </style>
+  <script type="module" crossorigin src="./assets/assets-PrMjI9mP.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/AssetBrowser-CM6sHEBa.js">
+</head>
+<body>
+  <div id="asset-browser-root"></div>
+  <div id="view"><span class="n" id="vn"></span><span class="x" id="vx">✕</span></div>
+</body>
+</html>

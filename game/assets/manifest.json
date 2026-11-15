@@ -1,0 +1,318 @@
+{
+ "textures": {
+  "concrete_rough": {
+   "diff": "textures/concrete_rough_diff.webp",
+   "nor": "textures/concrete_rough_nor.webp",
+   "arm": "textures/concrete_rough_arm.webp"
+  },
+  "plaster_peeling": {
+   "diff": "textures/plaster_peeling_diff.webp",
+   "nor": "textures/plaster_peeling_nor.webp",
+   "arm": "textures/plaster_peeling_arm.webp"
+  },
+  "plaster_mossy": {
+   "diff": "textures/plaster_mossy_diff.webp",
+   "nor": "textures/plaster_mossy_nor.webp",
+   "arm": "textures/plaster_mossy_arm.webp"
+  },
+  "plaster_damaged": {
+   "diff": "textures/plaster_damaged_diff.webp",
+   "nor": "textures/plaster_damaged_nor.webp",
+   "arm": "textures/plaster_damaged_arm.webp",
+   "disp": "textures/plaster_damaged_disp.webp"
+  },
+  "ground_debris": {
+   "diff": "textures/ground_debris_diff.webp",
+   "nor": "textures/ground_debris_nor.webp",
+   "arm": "textures/ground_debris_arm.webp",
+   "disp": "textures/ground_debris_disp.webp"
+  },
+  "concrete_rebar": {
+   "diff": "textures/concrete_rebar_diff.webp",
+   "nor": "textures/concrete_rebar_nor.webp",
+   "arm": "textures/concrete_rebar_arm.webp"
+  },
+  "concrete_wall": {
+   "diff": "textures/concrete_wall_diff.webp",
+   "nor": "textures/concrete_wall_nor.webp",
+   "arm": "textures/concrete_wall_arm.webp"
+  },
+  "concrete_floor": {
+   "diff": "textures/concrete_floor_diff.webp",
+   "nor": "textures/concrete_floor_nor.webp",
+   "arm": "textures/concrete_floor_arm.webp",
+   "disp": "textures/concrete_floor_disp.webp"
+  },
+  "brick_broken": {
+   "diff": "textures/brick_broken_diff.webp",
+   "nor": "textures/brick_broken_nor.webp",
+   "arm": "textures/brick_broken_arm.webp",
+   "disp": "textures/brick_broken_disp.webp"
+  },
+  "brick_wall": {
+   "diff": "textures/brick_wall_diff.webp",
+   "nor": "textures/brick_wall_nor.webp",
+   "arm": "textures/brick_wall_arm.webp",
+   "disp": "textures/brick_wall_disp.webp"
+  },
+  "wood_weathered": {
+   "diff": "textures/wood_weathered_diff.webp",
+   "nor": "textures/wood_weathered_nor.webp",
+   "arm": "textures/wood_weathered_arm.webp"
+  },
+  "ground_mud": {
+   "diff": "textures/ground_mud_diff.webp",
+   "nor": "textures/ground_mud_nor.webp",
+   "arm": "textures/ground_mud_arm.webp",
+   "disp": "textures/ground_mud_disp.webp"
+  },
+  "metal_corrugated": {
+   "diff": "textures/metal_corrugated_diff.webp",
+   "nor": "textures/metal_corrugated_nor.webp",
+   "arm": "textures/metal_corrugated_arm.webp"
+  },
+  "metal_rust": {
+   "diff": "textures/metal_rust_diff.webp",
+   "nor": "textures/metal_rust_nor.webp",
+   "arm": "textures/metal_rust_arm.webp"
+  },
+  "bark": {
+   "diff": "textures/bark_diff.webp",
+   "nor": "textures/bark_nor.webp",
+   "arm": "textures/bark_arm.webp"
+  },
+  "fabric": {
+   "diff": "textures/fabric_diff.webp",
+   "nor": "textures/fabric_nor.webp",
+   "arm": "textures/fabric_arm.webp"
+  },
+  "ground_rubble": {
+   "diff": "textures/ground_rubble_diff.webp",
+   "nor": "textures/ground_rubble_nor.webp",
+   "arm": "textures/ground_rubble_arm.webp",
+   "disp": "textures/ground_rubble_disp.webp"
+  },
+  "ground_leaves": {
+   "diff": "textures/ground_leaves_diff.webp",
+   "nor": "textures/ground_leaves_nor.webp",
+   "arm": "textures/ground_leaves_arm.webp",
+   "disp": "textures/ground_leaves_disp.webp"
+  },
+  "ground_burnt": {
+   "diff": "textures/ground_burnt_diff.webp",
+   "nor": "textures/ground_burnt_nor.webp",
+   "arm": "textures/ground_burnt_arm.webp",
+   "disp": "textures/ground_burnt_disp.webp"
+  },
+  "ground_forest": {
+   "diff": "textures/ground_forest_diff.webp",
+   "nor": "textures/ground_forest_nor.webp",
+   "arm": "textures/ground_forest_arm.webp",
+   "disp": "textures/ground_forest_disp.webp"
+  },
+  "ground_gravel_leaves": {
+   "diff": "textures/ground_gravel_leaves_diff.webp",
+   "nor": "textures/ground_gravel_leaves_nor.webp",
+   "arm": "textures/ground_gravel_leaves_arm.webp",
+   "disp": "textures/ground_gravel_leaves_disp.webp"
+  },
+  "ground_asphalt": {
+   "diff": "textures/ground_asphalt_diff.webp",
+   "nor": "textures/ground_asphalt_nor.webp",
+   "arm": "textures/ground_asphalt_arm.webp",
+   "disp": "textures/ground_asphalt_disp.webp"
+  },
+  "bark_pine": {
+   "diff": "textures/bark_pine_diff.webp",
+   "nor": "textures/bark_pine_nor.webp",
+   "arm": "textures/bark_pine_arm.webp"
+  },
+  "bark_willow": {
+   "diff": "textures/bark_willow_diff.webp",
+   "nor": "textures/bark_willow_nor.webp",
+   "arm": "textures/bark_willow_arm.webp"
+  },
+  "metal_galv": {
+   "diff": "textures/metal_galv_diff.webp",
+   "nor": "textures/metal_galv_nor.webp",
+   "arm": "textures/metal_galv_arm.webp"
+  },
+  "plywood": {
+   "diff": "textures/plywood_diff.webp",
+   "nor": "textures/plywood_nor.webp",
+   "arm": "textures/plywood_arm.webp"
+  },
+  "brick_white": {
+   "diff": "textures/brick_white_diff.webp",
+   "nor": "textures/brick_white_nor.webp",
+   "arm": "textures/brick_white_arm.webp"
+  },
+  "concrete_panel": {
+   "diff": "textures/concrete_panel_diff.webp",
+   "nor": "textures/concrete_panel_nor.webp",
+   "arm": "textures/concrete_panel_arm.webp"
+  },
+  "mud_wet": {
+   "diff": "textures/mud_wet_diff.webp",
+   "nor": "textures/mud_wet_nor.webp",
+   "arm": "textures/mud_wet_arm.webp"
+  },
+  "mud_tracks": {
+   "diff": "textures/mud_tracks_diff.webp",
+   "nor": "textures/mud_tracks_nor.webp",
+   "arm": "textures/mud_tracks_arm.webp"
+  }
+ },
+ "models": {
+  "old_military_crate": "models/old_military_crate.glb",
+  "concrete_road_barrier": "models/concrete_road_barrier.glb",
+  "covered_car": "models/covered_car.glb",
+  "wooden_crate_01": "models/wooden_crate_01.glb",
+  "wooden_crate_02": "models/wooden_crate_02.glb",
+  "wooden_military_crate": "models/wooden_military_crate.glb",
+  "concrete_road_barrier_02": "models/concrete_road_barrier_02.glb",
+  "cardboard_box_01": "models/cardboard_box_01.glb",
+  "cement_bag": "models/cement_bag.glb",
+  "metal_trash_can": "models/metal_trash_can.glb",
+  "trashbag": "models/trashbag.glb",
+  "Barrel_01": "models/Barrel_01.glb",
+  "old_tyre": "models/old_tyre.glb",
+  "barrel_03": "models/barrel_03.glb",
+  "metal_jerrycan": "models/metal_jerrycan.glb",
+  "propane_tank": "models/propane_tank.glb",
+  "rollershutter_door": "models/rollershutter_door.glb",
+  "plastic_crate_01": "models/plastic_crate_01.glb",
+  "utility_box_01": "models/utility_box_01.glb",
+  "hanging_industrial_lamp": "models/hanging_industrial_lamp.glb",
+  "exterior_aircon_unit": "models/exterior_aircon_unit.glb",
+  "mounted_fluorescent_lights": "models/mounted_fluorescent_lights.glb",
+  "wooden_ladder": "models/wooden_ladder.glb",
+  "grass_medium_01": "models/grass_medium_01.glb",
+  "boulder_01": "models/boulder_01.glb",
+  "dead_tree_trunk": "models/dead_tree_trunk.glb",
+  "shrub_02": "models/shrub_02.glb",
+  "rock_moss_set_01": "models/rock_moss_set_01.glb",
+  "plastic_monobloc_chair_01": "models/plastic_monobloc_chair_01.glb",
+  "old_bed_frame": "models/old_bed_frame.glb",
+  "steel_frame_shelves_01": "models/steel_frame_shelves_01.glb",
+  "spray_paint_bottles": "models/spray_paint_bottles.glb",
+  "SchoolDesk_01": "models/SchoolDesk_01.glb",
+  "security_light": "models/security_light.glb",
+  "power_box_01": "models/power_box_01.glb",
+  "water_manhole_cover": "models/water_manhole_cover.glb",
+  "ammo_box": "models/ammo_box.glb",
+  "dead_tree_trunk_02": "models/dead_tree_trunk_02.glb",
+  "industrial_pastic_container": "models/industrial_pastic_container.glb",
+  "portable_generator": "models/portable_generator.glb",
+  "flood_lights": "models/flood_lights.glb",
+  "modular_electricity_poles": "models/modular_electricity_poles.glb",
+  "dry_branches_medium_01": "models/dry_branches_medium_01.glb",
+  "tree_stump_01": "models/tree_stump_01.glb",
+  "root_cluster_01": "models/root_cluster_01.glb",
+  "modular_chainlink_fence": "models/modular_chainlink_fence.glb"
+ },
+ "hdri": {
+  "env": "hdri/kloofendal_overcast_puresky_2k.hdr",
+  "sunny": "hdri/kloofendal_48d_partly_cloudy_puresky_2k.hdr"
+ },
+ "decals": {
+  "GraffitiSet001": [
+   "decals/GraffitiSet001/GraffitiSet001_1K-PNG_Color.webp",
+   "decals/GraffitiSet001/GraffitiSet001_1K-PNG_Opacity.webp"
+  ],
+  "Leaking019A": [
+   "decals/Leaking019A/Leaking019A_1K-JPG_Color.webp"
+  ],
+  "Fence006": [
+   "decals/Fence006/Fence006_1K-PNG_Color.webp",
+   "decals/Fence006/Fence006_1K-PNG_NormalGL.webp",
+   "decals/Fence006/Fence006_1K-PNG_Opacity.webp"
+  ]
+ },
+ "credits": [
+  "Poly Haven · rough_concrete (CC0)",
+  "Poly Haven · peeling_painted_wall (CC0)",
+  "Poly Haven · worn_mossy_plasterwall (CC0)",
+  "Poly Haven · damaged_plaster (CC0)",
+  "Poly Haven · white_plaster_rough_01 (CC0)",
+  "Poly Haven · concrete_debris (CC0)",
+  "Poly Haven · rebar_reinforced_concrete (CC0)",
+  "Poly Haven · concrete_wall_008 (CC0)",
+  "Poly Haven · concrete_floor_damaged_01 (CC0)",
+  "Poly Haven · broken_brick_wall (CC0)",
+  "Poly Haven · brick_wall_02 (CC0)",
+  "Poly Haven · weathered_planks (CC0)",
+  "Poly Haven · brown_mud_leaves_01 (CC0)",
+  "Poly Haven · corrugated_iron_02 (CC0)",
+  "Poly Haven · rusty_metal_02 (CC0)",
+  "Poly Haven · dirty_tiles (CC0)",
+  "Poly Haven · bark_brown_02 (CC0)",
+  "Poly Haven · denim_fabric (CC0)",
+  "Poly Haven · rubble (CC0)",
+  "Poly Haven · forest_leaves_02 (CC0)",
+  "Poly Haven · burned_ground_01 (CC0)",
+  "Poly Haven · forest_ground_04 (CC0)",
+  "Poly Haven · leaf_scattered_gravel (CC0)",
+  "Poly Haven · asphalt_02 (CC0)",
+  "Poly Haven · pine_bark (CC0)",
+  "Poly Haven · bark_willow (CC0)",
+  "Poly Haven · metal_plate (CC0)",
+  "Poly Haven · plywood (CC0)",
+  "Poly Haven · whitewashed_brick (CC0)",
+  "Poly Haven · precast_concrete_wall (CC0)",
+  "Poly Haven · old_military_crate (CC0)",
+  "Poly Haven · concrete_road_barrier (CC0)",
+  "Poly Haven · covered_car (CC0)",
+  "Poly Haven · wooden_crate_01 (CC0)",
+  "Poly Haven · wooden_crate_02 (CC0)",
+  "Poly Haven · wooden_military_crate (CC0)",
+  "Poly Haven · concrete_road_barrier_02 (CC0)",
+  "Poly Haven · cardboard_box_01 (CC0)",
+  "Poly Haven · cement_bag (CC0)",
+  "Poly Haven · metal_trash_can (CC0)",
+  "Poly Haven · trashbag (CC0)",
+  "Poly Haven · Barrel_01 (CC0)",
+  "Poly Haven · old_tyre (CC0)",
+  "Poly Haven · barrel_03 (CC0)",
+  "Poly Haven · metal_jerrycan (CC0)",
+  "Poly Haven · propane_tank (CC0)",
+  "Poly Haven · rollershutter_door (CC0)",
+  "Poly Haven · plastic_crate_01 (CC0)",
+  "Poly Haven · utility_box_01 (CC0)",
+  "Poly Haven · hanging_industrial_lamp (CC0)",
+  "Poly Haven · exterior_aircon_unit (CC0)",
+  "Poly Haven · mounted_fluorescent_lights (CC0)",
+  "Poly Haven · wooden_ladder (CC0)",
+  "Poly Haven · grass_medium_01 (CC0)",
+  "Poly Haven · boulder_01 (CC0)",
+  "Poly Haven · dead_tree_trunk (CC0)",
+  "Poly Haven · shrub_02 (CC0)",
+  "Poly Haven · rock_moss_set_01 (CC0)",
+  "Poly Haven · plastic_monobloc_chair_01 (CC0)",
+  "Poly Haven · old_bed_frame (CC0)",
+  "Poly Haven · steel_frame_shelves_01 (CC0)",
+  "Poly Haven · spray_paint_bottles (CC0)",
+  "Poly Haven · SchoolDesk_01 (CC0)",
+  "Poly Haven · security_light (CC0)",
+  "Poly Haven · power_box_01 (CC0)",
+  "Poly Haven · water_manhole_cover (CC0)",
+  "Poly Haven · ammo_box (CC0)",
+  "Poly Haven · dead_tree_trunk_02 (CC0)",
+  "Poly Haven · industrial_pastic_container (CC0)",
+  "Poly Haven · portable_generator (CC0)",
+  "Poly Haven · flood_lights (CC0)",
+  "Poly Haven · modular_electricity_poles (CC0)",
+  "Poly Haven · dry_branches_medium_01 (CC0)",
+  "Poly Haven · tree_stump_01 (CC0)",
+  "Poly Haven · root_cluster_01 (CC0)",
+  "Poly Haven · modular_chainlink_fence (CC0)",
+  "Poly Haven HDRI · kloofendal_overcast_puresky (CC0)",
+  "Poly Haven HDRI · kloofendal_48d_partly_cloudy_puresky (CC0)",
+  "ambientCG · GraffitiSet001 (CC0)",
+  "ambientCG · Leaking019A (CC0)",
+  "ambientCG · Leaking012A (CC0)",
+  "ambientCG · Fence006 (CC0)",
+  "Poly Haven · brown_mud_03 (CC0)",
+  "Poly Haven · muddy_tracks (CC0)"
+ ]
+}

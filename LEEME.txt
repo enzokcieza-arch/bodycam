@@ -1,0 +1,30 @@
+BODYCAM TACTICAL — URBEX (paquete para Mac)
+==========================================
+
+JUGAR
+  1. Descomprime el ZIP.
+  2. Doble clic en "Jugar Bodycam.command".
+     · La PRIMERA vez macOS dirá que es de un desarrollador no identificado:
+       clic derecho (o Ctrl+clic) sobre el archivo → Abrir → Abrir.
+       (Alternativa en Terminal:  xattr -dr com.apple.quarantine ~/Downloads/BodycamTactical-Mac )
+  3. Se abre el navegador en http://localhost:8765 . Deja abierta la ventana de Terminal mientras juegas.
+  Recomendado: Google Chrome (WebGL2 más rápido y mide el tiempo de GPU). Safari también funciona.
+
+BENCHMARK
+  Doble clic en "Benchmark.command" → recorre patio, pasillo superior, escalera y soportal (10 s cada uno).
+  Al terminar pulsa "copiar informe" en el panel (F3) y pégalo en el chat.
+
+BUSCADOR DE MODELOS 3D
+  En el juego pulsa B, o abre http://localhost:8765/asset-browser.html
+  Fuentes: Poly Haven (CC0), ambientCG (CC0, vía el servidor local), Sketchfab (licencias CC; para descargar
+  necesitas tu token gratuito). "Guardar" copia el modelo a game/assets/imported/ para usarlo sin Internet.
+  También puedes arrastrar tus propios .glb / .gltf / .fbx / .obj / .zip.
+
+CONTROLES
+  WASD mover · Shift correr · C/Ctrl agachar · Espacio saltar · Q/E asomarse · Clic disparar · Clic der. apuntar
+  R recargar · V auto/semi · G granada · F linterna · B buscador de modelos · F3 rendimiento · Esc menú
+  Parámetros URL: ?q=low|medium|high  ·  ?bench
+
+CONTENIDO
+  game/      juego compilado (Three.js + WebGL2). Assets CC0 de Poly Haven y ambientCG, AK + brazos del usuario.
+  server/    servidor local nativo (Go) sin Python ni Node: arm64 (Apple Silicon, firmado ad-hoc) y x86_64 (Intel).
