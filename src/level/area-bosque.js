@@ -11,7 +11,7 @@ const St = -90,
   An = {
     forest_burnt: {
       tex: "ground_burnt",
-      tint: 2895152,
+      tint: 0x5a5550, // v3.0: ceniza gris-parda (antes 0x2c2d30, casi negro: el detalle del suelo se perdía)
       normal: 1.4,
       roughness: 1.75,
       tile: 3.2,
@@ -19,7 +19,7 @@ const St = -90,
     },
     forest_mud: {
       tex: "mud_wet",
-      tint: 2500135,
+      tint: 0x3d3834,
       normal: 1.3,
       roughness: 1.6,
       tile: 2.6,

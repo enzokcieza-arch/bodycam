@@ -72,8 +72,8 @@ class Bc {
           : e.pbr(f, da[f] || {});
       (Xn[f] && !w.userData.wet && (Ql(w, Xn[f]), (w.userData.wet = !0)),
         m?.surface === "water" &&
-          ((w.roughness = 0.32),
-          (w.envMapIntensity = 0.12),
+          ((w.roughness = 0.05),
+          (w.envMapIntensity = 0.55),
           w.color.setRGB(0.03, 0.032, 0.035),
           (w.needsUpdate = !0)));
       const y = new ht(g, w);

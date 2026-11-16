@@ -28,6 +28,7 @@ export const LOOK_CONTROLS = [
   ["compression", "compresión (macrobloques)", 0, 2, 0.05, "post"],
   ["rollingShutter", "rolling shutter", 0, 3, 0.05, "post"],
   ["motionBlurAmt", "motion blur", 0, 2, 0.05, "post"],
+  ["reflections", "reflejos en suelo mojado (SSR)", 0, 2, 0.05, "post"],
   ["ao", "oclusión ambiental (SSAO)", 0, 1.5, 0.05, "post"],
   ["ATMÓSFERA"],
   ["haze", "neblina / haze", 0, 3, 0.05, "atmo"],
@@ -41,7 +42,7 @@ export const LOOK_CONTROLS = [
 
 // efectos que "medir coste" apaga uno a uno (clave → valor apagado)
 const COST_TESTS = [
-  ["compression", 0], ["lensDirt", 0], ["motionBlurAmt", 0], ["ao", 0], ["bloom", 0],
+  ["compression", 0], ["reflections", 0], ["lensDirt", 0], ["motionBlurAmt", 0], ["ao", 0], ["bloom", 0],
   ["volumetric", 0], ["dust", 0], ["haze", 0],
 ];
 

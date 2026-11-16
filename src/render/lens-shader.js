@@ -10,6 +10,7 @@
 //   MB_N          nº de muestras del motion blur / aberración
 //   MB_DEPTH      0/1  velocidad por píxel con profundidad (traslación + rotación); 0 = solo rotación
 //   LENS_DIRT     0/1  textura de suciedad de lente que se enciende con las luces fuertes
+//   USE_SSR       0/1  compone los reflejos de suelos mojados (render/ssr.js)
 //   VOLUMETRIC    0/1  compone el pase de atmósfera (render/volumetric.js)
 //   COMPRESSION   0/1  artefactos de códec (croma 4:2:0, macrobloques 8×8, cuantización en sombras)
 export const finalFrag = (common) => /* glsl */ `
@@ -36,7 +37,7 @@ export const finalFrag = (common) => /* glsl */ `
   uniform float accent;        // cuánto conservan su color los rojos/cálidos (luz de emergencia, óxido)
   uniform float sensorGain;    // pendiente del sensor: >1 quema antes las altas luces
   uniform float sharpen; uniform float contrast;
-  uniform sampler2D tVol; uniform vec3 hazeColor;
+  uniform sampler2D tVol; uniform vec3 hazeColor; uniform sampler2D tSSR;
   varying vec2 vUv;
   ${common}
 
@@ -146,6 +147,13 @@ export const finalFrag = (common) => /* glsl */ `
     }
     #endif
     // ── atmósfera: neblina con altura + luz dispersada por fluorescentes, balizas, linterna y huecos al cielo
+    // reflejos en suelos mojados / charcos (render/ssr.js)
+    #if USE_SSR
+    {
+      vec4 rf = texture2D(tSSR, uvC);
+      col = mix(col, rf.rgb, rf.a);
+    }
+    #endif
     #if VOLUMETRIC
     {
       vec4 vol = texture2D(tVol, uvC);

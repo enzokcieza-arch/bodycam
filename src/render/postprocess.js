@@ -3,6 +3,7 @@ import { D as nr, F as rr, H as v0, L as $a, N as Fo, O as ar, U as ir, a as Rt,
 import { a5 as CanvasTexture, v as Te } from "three-vendor";
 import { finalFrag, makeLensDirtCanvas } from "./lens-shader.js";
 import { volFrag, VOL_MAX_LIGHTS } from "./volumetric.js";
+import { ssrFrag } from "./ssr.js";
 import { Vector3, Color } from "../three.js";
 
 const Ur =
@@ -242,6 +243,20 @@ class Er {
           texel: { value: new Rt() },
         },
       )),
+      (this.projWide = new B()),
+      (this.ssrMat = ts(
+        ssrFrag(G0),
+        {
+          tColor: { value: null },
+          tDepth: { value: null },
+          projWide: { value: this.projWide },
+          upView: { value: new Vector3(0, 1, 0) },
+          time: { value: 0 },
+          strength: { value: 1 },
+          ...e(),
+        },
+        { SSR_STEPS: 24 },
+      )),
       (this.volMat = ts(
         volFrag(G0),
         {
@@ -295,6 +310,7 @@ class Er {
           vmOcc: { value: 0.5 },
           tBloomWide: { value: null },
           tVol: { value: null },
+          tSSR: { value: null },
           hazeColor: { value: new Color() },
           tDirt: { value: null },
           reprojFull: { value: new B() },
@@ -315,7 +331,7 @@ class Er {
           contrast: { value: 1 },
           ...e(),
         },
-        { USE_AO: 0, MB_N: 6, MB_DEPTH: 0, LENS_DIRT: 0, COMPRESSION: 0, VOLUMETRIC: 0 },
+        { USE_AO: 0, MB_N: 6, MB_DEPTH: 0, LENS_DIRT: 0, COMPRESSION: 0, VOLUMETRIC: 0, USE_SSR: 0 },
       )),
       this.rebuild());
   }
@@ -362,6 +378,12 @@ class Er {
         (this.aoMat.needsUpdate = !0));
     }
     const i = this.ssao ? 1 : 0;
+    this.ssrRT = null;
+    if (t.ssr) {
+      this.ssrRT = new Qe(4, 4, { type: v0, minFilter: Eo, magFilter: Eo, depthBuffer: !1 });
+      this.ssrMat.defines.SSR_STEPS = t.ssrSteps || 24;
+      this.ssrMat.needsUpdate = !0;
+    }
     this.volRT = null;
     if (t.volumetric) {
       this.volRT = new Qe(4, 4, { type: v0, minFilter: Eo, magFilter: Eo, depthBuffer: !1 });
@@ -393,6 +415,7 @@ class Er {
         LENS_DIRT: t.lensDirt && p.lensDirt > 0 ? 1 : 0,
         COMPRESSION: t.compression && p.compression > 0 ? 1 : 0,
         VOLUMETRIC: this.volRT && this.atmo.enabled ? 1 : 0,
+        USE_SSR: this.ssrRT && (p.reflections ?? 1) > 0 ? 1 : 0,
       };
     for (const k in nd)
       fd[k] !== nd[k] && ((fd[k] = nd[k]), (this.finalMat.needsUpdate = !0));
@@ -404,6 +427,7 @@ class Er {
       this.aoRT,
       this.aoRT2,
       this.volRT,
+      this.ssrRT,
       ...(this.adaptRT || []),
       ...(this.down || []),
       ...(this.up || []),
@@ -426,6 +450,7 @@ class Er {
       (this.aoRT.setSize(n, r), this.aoRT2.setSize(n, r));
     }
     this.volRT && this.volRT.setSize(Math.max(1, t >> 1), Math.max(1, e >> 1));
+    this.ssrRT && this.ssrRT.setSize(Math.max(1, t >> 1), Math.max(1, e >> 1));
     this.resizeCount = (this.resizeCount || 0) + 1;
   }
   resetAdaptation() {
@@ -452,6 +477,7 @@ class Er {
       c = this.sceneRT.depthTexture,
       d = e.projectionMatrix.elements;
     (this.projInfo.set(d[0], d[5], d[8], d[9]), this.clipNF.set(e.near, e.far));
+    this.projWide.copy(e.projectionMatrix);
     const p = Wr.multiplyMatrices(
       e.projectionMatrix,
       qr.extractRotation(e.matrixWorldInverse),
@@ -493,6 +519,16 @@ class Er {
         (C.tAO.value = this.aoRT2.texture),
         C.dir.value.set(0, 1 / k),
         this.pass(this.aoBlurMat, this.aoRT));
+    }
+    if (this.ssrRT && (i.reflections ?? 1) > 0) {
+      const S = this.ssrMat.uniforms;
+      S.tColor.value = h;
+      S.tDepth.value = c;
+      S.upView.value.set(0, 1, 0).transformDirection(e.matrixWorldInverse);
+      S.time.value = this.time;
+      S.strength.value = i.reflections ?? 1;
+      this.pass(this.ssrMat, this.ssrRT);
+      b0.tSSR.value = this.ssrRT.texture;
     }
     if (this.volRT && this.atmo.enabled) {
       const A = this.atmo, V = this.volMat.uniforms, vi = e.matrixWorldInverse;
@@ -629,9 +665,10 @@ const LOOK_DEFAULTS = {
   chromaGrain: 0.8,
   saturation: 1.25,
   accent: 1,
-  sensorGain: 1,
+  sensorGain: 1.15,
   sharpen: 1,
   contrast: 1,
+  reflections: 1,
   exposureComp: 1,
   motionBlurAmt: 1,
 };
@@ -660,6 +697,8 @@ const Wr = new B(),
       compression: !1,
       volumetric: !1,
       godrays: !1,
+      ssr: !1,
+      ssrSteps: 0,
       volSteps: 0,
       dust: 0,
       clutter: 0.5,
@@ -688,6 +727,8 @@ const Wr = new B(),
       volumetric: !0,
       godrays: !0,
       volSteps: 8,
+      ssr: !0,
+      ssrSteps: 24,
       dust: 450,
       clutter: 1,
       forest: 1,
@@ -716,6 +757,8 @@ const Wr = new B(),
       volumetric: !0,
       godrays: !0,
       volSteps: 14,
+      ssr: !0,
+      ssrSteps: 40,
       dust: 1100,
       clutter: 1.3,
       forest: 1.6,

@@ -34,8 +34,8 @@ const tc = {
       stains: 0.6,
     },
     ground_burnt: {
-      scale: 0.07,
-      puddles: 0.7,
+      scale: 0.09,
+      puddles: 0.28,
       macro: 0.45,
       cavity: 0.4,
       world: !0,
@@ -218,7 +218,7 @@ float pomSelfShadow(vec3 L) {
   float hb = pomP1.x > 0.5 ? textureGrad(pomHeight, (pomUv + pomOffB) * pomP2.w, pomDx * pomP2.w, pomDy * pomP2.w).r : ha;
   pomMixW = pomP1.x > 0.5 ? pomW(ha, hb) : 0.0;
   pomH = mix(ha, hb, pomMixW);
-  pomWet = pomWater > 0.0 ? smoothstep(pomWater + 0.06, pomWater - 0.01, pomH) : 0.0;
+  pomWet = pomWater > 0.0 ? smoothstep(pomWater + 0.16, pomWater - 0.02, pomH) : 0.0;
 }
 `;
 function Js(a, t) {

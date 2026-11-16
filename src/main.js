@@ -5,6 +5,7 @@ import { LookPanel } from "./ui/lookpanel.js";
 import { Atmosphere } from "./world/atmosphere.js";
 import { autoGraffiti } from "./world/autograffiti.js";
 import { forestFloor } from "./world/dressing.js";
+import { markReflective } from "./render/ssr.js";
 import { enhanceViewmodel, updateGunFx } from "./weapon/gunfx.js";
 import { Nr } from "./core/input.js";
 import { Hr } from "./core/perf.js";
@@ -190,6 +191,19 @@ async function xh() {
           cheap: E.qualityKey === "low",
           resetEnvMapIntensity: !0,
         }),
+      // suelos mojados → máscara de reflejos SSR (después de POM, sondas y humedad: encadena sus parches)
+      E.quality.ssr &&
+        (() => {
+          for (const m of ue.staticMeshes) {
+            const mat = m.material;
+            if (!m.name.startsWith("static:") || !mat || Array.isArray(mat) || mat.transparent) continue;
+            const ex = [];
+            if (m.userData.surface === "water") ex.push("1.0");
+            if (mat.userData.pom) ex.push("max(pomWet, pomStain * 0.35)");
+            if (mat.userData.wg && mat.userData.lightProbes) ex.push("wgRefl");
+            ex.length && markReflective(mat, ex.reduce((a, b) => `max(${a}, ${b})`));
+          }
+        })(),
       us(0.86, "Precompilando shaders/pipelines…"),
       (le.flash.visible = !0),
       (le.flashLight.intensity = 1),
