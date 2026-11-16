@@ -1,5 +1,5 @@
 // fx/particles.js — extraído del build v2.5 (nombres minificados conservados; ver docs/MODULOS.md)
-import { B as Z, E as Ut, Q, V as P, Y as vt, Z as Ae, aA as zr, aB as Cr, ae as Se, ak as co, al as Va, am as fo, av as Ya, ay as Pr, az as Bi, b as Ai, d as Tt, f as Ha, h as Fi, i as xo, o as B, p as Ke, u as Pi } from "three-vendor";
+import { a as Rt, B as Z, E as Ut, Q, V as P, Y as vt, Z as Ae, aA as zr, aB as Cr, ae as Se, ak as co, al as Va, am as fo, av as Ya, ay as Pr, az as Bi, b as Ai, d as Tt, f as Ha, h as Fi, i as xo, o as B, p as Ke, u as Pi } from "three-vendor";
 import { Il, K, Ul } from "../world/geometry-utils.js";
 import { L0, Yc, ci } from "../weapon/viewmodel.js";
 
@@ -31,16 +31,33 @@ class hi {
           tex: { value: o },
           scale: { value: 800 },
           ambient: { value: 1 },
+          ambientC: { value: new P(1, 1, 1) },
+          lPos: { value: Array.from({ length: 8 }, () => new P()) },
+          lCol: { value: Array.from({ length: 8 }, () => new P()) },
+          tPos: { value: new P() },
+          tDir: { value: new P(0, 0, -1) },
+          tCol: { value: new P() },
+          tCone: { value: new Rt(0.8, 0.95) },
         },
-        vertexShader: `attribute vec4 pcolor; attribute vec2 psize; varying vec4 vC; varying float vK; varying float vR; uniform float scale;
+        // v3.0: el humo se ILUMINA (antes era autoiluminado: de noche brillaba en la oscuridad). Luz por partícula:
+        // ambiente local + luces puntuales cercanas (balizas, fluorescentes, bengalas, fogonazo, explosión) + linterna.
+        vertexShader: `attribute vec4 pcolor; attribute vec2 psize; varying vec4 vC; varying float vK; varying float vR; varying vec3 vL; uniform float scale;
+        uniform vec3 ambientC; uniform vec3 lPos[8]; uniform vec3 lCol[8]; uniform vec3 tPos; uniform vec3 tDir; uniform vec3 tCol; uniform vec2 tCone;
         void main(){ vec4 mv = modelViewMatrix * vec4(position,1.0); gl_Position = projectionMatrix * mv;
-          gl_PointSize = clamp(psize.x * scale / max(-mv.z, 0.05), 1.0, 400.0); vC = pcolor; vK = psize.y; vR = fract(psize.y*13.7 + position.x*3.1) * 6.283; }`,
-        fragmentShader: `uniform sampler2D tex; uniform float ambient; varying vec4 vC; varying float vK; varying float vR;
-        void main(){ vec2 c = gl_PointCoord - 0.5; float s = sin(vR), co = cos(vR); c = vec2(c.x*co - c.y*s, c.x*s + c.y*co) + 0.5;
-          vec2 uv = vec2((vK > 0.5 ? 0.5 : 0.0) + c.x * 0.5, 1.0 - c.y);
+          gl_PointSize = clamp(psize.x * scale / max(-mv.z, 0.05), 1.0, 400.0); vC = pcolor; vK = psize.y; vR = fract(psize.y*13.7 + position.x*3.1) * 6.283;
+          vec3 L = ambientC;
+          for (int i = 0; i < 8; i++) { vec3 d = lPos[i] - position; L += lCol[i] / max(dot(d, d), 0.35); }
+          vec3 td = position - tPos; float t2 = max(dot(td, td), 0.2);
+          L += tCol * smoothstep(tCone.x, tCone.y, dot(td * inversesqrt(t2), tDir)) / t2;
+          vL = L * 0.3183; }`,
+        fragmentShader: `uniform sampler2D tex; uniform float ambient; varying vec4 vC; varying float vK; varying float vR; varying vec3 vL;
+        void main(){ vec2 c0 = gl_PointCoord - 0.5; float s = sin(vR), co = cos(vR); vec2 c = vec2(c0.x*co - c0.y*s, c0.x*s + c0.y*co) + 0.5;
+          vec2 uv = vec2((vK > 0.5 ? 0.5 : 0.0) + clamp(c.x, 0.0, 1.0) * 0.5, 1.0 - clamp(c.y, 0.0, 1.0));
           vec4 t = texture2D(tex, uv);
-          float a = (vK > 0.5 ? t.a : t.r * 2.5) * vC.a;
-          vec3 col = vK > 0.5 ? vC.rgb * t.rgb * 3.0 : vC.rgb * ambient;
+          // máscara circular: al girar el sprite, sus esquinas leían fuera de la textura → cuadrados grises
+          float circ = smoothstep(0.5, 0.28, length(c0));
+          float a = (vK > 0.5 ? t.a : min(t.r * 2.5, 1.0) * circ) * vC.a;
+          vec3 col = vK > 0.5 ? vC.rgb * t.rgb * 3.0 : vC.rgb * vL;
           gl_FragColor = vec4(col, clamp(a, 0.0, 1.0)); if (gl_FragColor.a < 0.004) discard; }`,
         transparent: !0,
         depthWrite: !1,
@@ -747,6 +764,29 @@ vMapUv = uv * 0.25 + atlas;`,
         Math.max(this.shellMesh.count, this.shellIdx),
       )));
   }
+  // luces que iluminan el humo este frame (ver shader de hi). Las chispas comparten clase pero no usan estas uniformes.
+  lightSmoke(amb) {
+    const u = this.smoke.mat.uniforms,
+      L = [...(this.world?.dynamicLights || []), this.boomLight, ...(this.smokeLights?.extra || [])];
+    let n = 0;
+    for (const l of L) {
+      if (!l || !(l.intensity > 0.01) || n >= 8) continue;
+      l.getWorldPosition(u.lPos.value[n]);
+      u.lCol.value[n].set(l.color.r, l.color.g, l.color.b).multiplyScalar(l.intensity);
+      n++;
+    }
+    for (; n < 8; n++) u.lCol.value[n].set(0, 0, 0);
+    const a = (this.engine.post.night ? 0.07 : 1.6) * (amb ?? 1);
+    u.ambientC.value.set(a * 0.85, a * 0.92, a);
+    const T = this.smokeLights?.torch;
+    if (T && T.intensity > 0.05) {
+      T.getWorldPosition(u.tPos.value);
+      T.target.getWorldPosition(u.tDir.value);
+      u.tDir.value.sub(u.tPos.value).normalize();
+      u.tCol.value.set(T.color.r, T.color.g, T.color.b).multiplyScalar(T.intensity * 0.25);
+      u.tCone.value.set(Math.cos(T.angle), Math.cos(T.angle * (1 - T.penumbra)));
+    } else u.tCol.value.set(0, 0, 0);
+  }
   explosion(t) {
     const e = this.ambient;
     (this.boomLight.position.copy(t).add(ie.set(0, 0.6, 0)),
@@ -873,7 +913,7 @@ vMapUv = uv * 0.25 + atlas;`,
       )));
   }
   update(t, e, o) {
-    ((this.ambient = o), (this.smoke.mat.uniforms.ambient.value = 1));
+    ((this.ambient = 1), (this.smoke.mat.uniforms.ambient.value = 1), this.lightSmoke(o));
     const s =
       this.engine.post.h /
       (2 * Math.tan(Ai.degToRad(this.engine.camera.fov / 2)));
@@ -971,7 +1011,7 @@ vMapUv = uv * 0.25 + atlas;`,
       this.boomT > 0
         ? ((this.boomT -= t),
           (this.boomLight.intensity =
-            600 * Math.pow(Math.max(0, this.boomT / 0.35), 2)))
+            (this.engine.post.night ? 140 : 600) * Math.pow(Math.max(0, this.boomT / 0.35), 2)))
         : (this.boomLight.intensity = 0));
   }
 }

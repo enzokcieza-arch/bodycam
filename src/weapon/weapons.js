@@ -319,7 +319,7 @@ class uh {
         Ft.dot(rs) > 0.2 &&
         (this.engine.post.params.flash = Math.max(
           this.engine.post.params.flash,
-          Math.min(1.2, 8 / (s + 2)),
+          Math.min(0.6, 4 / (s + 2)),   // v3.0: a la mitad (antes dejaba la pantalla en blanco ~0.4 s)
         )),
       s < 14 &&
         (this.engine.post.params.tinnitus = Math.max(

@@ -182,6 +182,7 @@ async function xh() {
       (gfx = enhanceViewmodel(le, E, { redDot: !Xa.has("noreddot") })),
       (le.torchOn = !0),
       (xt = new Xc(E, ue, Be)),
+      (xt.smokeLights = { torch: le.torch, extra: [le.flashLight] }),
       (_t = new Uc(E, ue, Dt, Be)),
       (de = new uh(E, ue, _t, le, xt, Be, Wa)),
       Wa.update(de),
