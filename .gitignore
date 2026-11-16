@@ -2,3 +2,4 @@ node_modules/
 shots/tmp/
 *.log
 .DS_Store
+shots/after[0-9]*/
