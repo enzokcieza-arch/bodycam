@@ -1,0 +1,14 @@
+{
+  "name": "bodycam-tactical",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "watch": "vite build --watch",
+    "serve": "node tools/serve.mjs game 8765",
+    "shots": "node tools/shots.mjs",
+    "bench": "node tools/bench.mjs"
+  },
+  "devDependencies": { "vite": "^6.0.0" }
+}

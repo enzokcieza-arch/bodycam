@@ -1,0 +1,9 @@
+[
+ {"name":"1-pasillo","pos":[12.5,3.7,-11.2],"yaw":4.762,"pitch":-0.05},
+ {"name":"2-bosque-quemado","pos":[-25,6,21.4],"yaw":1.35,"pitch":-0.2},
+ {"name":"3-patio","pos":[1.5,0,9.5],"yaw":0.15,"pitch":0.02},
+ {"name":"4-bosque-oscuro","pos":[-50,8,59.6],"yaw":2.5,"pitch":-0.3},
+ {"name":"5-soportal","pos":[13.5,0,-12],"yaw":1.52,"pitch":0},
+ {"name":"6-callejon","pos":[19,0.3,-13],"yaw":-1.4,"pitch":0},
+ {"name":"7-obra","pos":[11.5,0,40.5],"yaw":2.15,"pitch":0.06}
+]

@@ -1,0 +1,6 @@
+medium  1-pasillo               4438 ms/frame   173 draws    476718 tris
+medium  2-bosque-quemado        3767 ms/frame    72 draws    455440 tris
+medium  1-pasillo               4630 ms/frame   177 draws    477008 tris
+medium  2-bosque-quemado        4181 ms/frame    76 draws    455730 tris
+low     1-pasillo               1355 ms/frame   170 draws    351769 tris
+low     2-bosque-quemado         694 ms/frame    68 draws    271906 tris
