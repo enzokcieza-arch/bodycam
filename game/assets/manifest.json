@@ -247,7 +247,20 @@
   "industrial_storage_cart": "models/industrial_storage_cart.glb",
   "plastic_jerrycan": "models/plastic_jerrycan.glb",
   "sofa_02": "models/sofa_02.glb",
-  "metal_stool_02": "models/metal_stool_02.glb"
+  "metal_stool_02": "models/metal_stool_02.glb",
+  "bark_debris_01_lod": "models/bark_debris_01_lod.glb",
+  "dead_tree_trunk_02_lod": "models/dead_tree_trunk_02_lod.glb",
+  "dead_tree_trunk_lod": "models/dead_tree_trunk_lod.glb",
+  "dry_branches_medium_01_lod": "models/dry_branches_medium_01_lod.glb",
+  "nettle_plant_lod": "models/nettle_plant_lod.glb",
+  "pine_roots_lod": "models/pine_roots_lod.glb",
+  "rock_07_lod": "models/rock_07_lod.glb",
+  "rock_09_lod": "models/rock_09_lod.glb",
+  "root_cluster_02_lod": "models/root_cluster_02_lod.glb",
+  "shrub_04_lod": "models/shrub_04_lod.glb",
+  "single_root_lod": "models/single_root_lod.glb",
+  "stone_01_lod": "models/stone_01_lod.glb",
+  "tree_stump_02_lod": "models/tree_stump_02_lod.glb"
  },
  "hdri": {
   "env": "hdri/kloofendal_overcast_puresky_2k.hdr",

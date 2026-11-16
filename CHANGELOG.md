@@ -55,6 +55,18 @@ godrays, wetness, grime, emergency.
   niebla con el color de la luz ambiente local y 45 % menos densa, curva S más fuerte (`contrast`), saturación 1.25.
 - Pasada automática de grafitis (`src/world/autograffiti.js`): 45 (media) / 80 (alta) pintadas extra por raycast.
 
+### Set dressing con modelos CC0 (`src/world/dressing.js`, `tools/fetch-polyhaven.py`)
+- Sketchfab necesita token para descargar; se usan modelos CC0 fotoescaneados de Poly Haven (sin cuenta).
+- 38 modelos nuevos (≈23 MB, webp + meshopt): mobiliario de oficina/hospital, cajas, bidones, latas, garrafas,
+  llantas, estufa de barril, carritos; helechos, ortigas, raíces, piedras, corteza, tocón.
+- Desorden urbano: grupos apoyados contra los muros (objeto grande + basura pequeña), con capa de polvo.
+- Sotobosque instanciado: helechos/ortigas en el bosque oscuro; troncos, ramas y raíces carbonizados en el quemado.
+  Versiones `*_lod` simplificadas (~5k triángulos) + presupuesto de triángulos por zona (los originales tienen
+  hasta 340k y, instanciados, hundían el rendimiento).
+- Pliegues y costuras procedurales (bump) en mangas y guantes.
+- Calidad: `clutter` 0.5/1/1.3 y `forest` 0.4/1/1.6 (baja/media/alta).
+
 ### Pendiente
-- NPC/operadores (sin modelo CC0 con esqueleto), sombras de contacto en brazos.
+- NPC/operadores y brazos/arma de alta calidad: los candidatos CC-BY están en Sketchfab (requiere token válido).
+- Sombras de contacto en brazos.
 - Fase 5: audio. Rebake de GI (el horneador no está en el repo). Medición real de fps en Mac.

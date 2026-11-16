@@ -29,15 +29,15 @@ function addWear(mat, { scale = 60, scratches = 0, grease = 0, edge = 0, weave =
       .replace("#include <normal_fragment_maps>", /* glsl */ `#include <normal_fragment_maps>
         // pliegues de tela / costuras (solo materiales con trama): bump procedural por derivadas de pantalla
         if (wearAmt.w > 0.0) {
-          vec3 fp = vObjPos * wearScale;
-          float hh = wfbm(vec3(fp.x * 0.45, fp.y * 0.45, fp.z * 2.2)) * 0.8 + wn(fp * 5.0) * 0.2;
-          hh += smoothstep(0.92, 1.0, abs(sin(fp.z * 1.3))) * 0.35;                // costuras transversales
+          vec3 fp = vObjPos * wearScale * 0.12;
+          float hh = wfbm(vec3(fp.x * 0.6, fp.y * 0.6, fp.z * 2.4));
+          hh += smoothstep(0.94, 1.0, abs(sin(fp.z * 1.1))) * 0.25;                // costuras transversales
           vec3 dpx = dFdx(-vViewPosition), dpy = dFdy(-vViewPosition);
           float dhx = dFdx(hh), dhy = dFdy(hh);
           vec3 r1 = cross(dpy, normal), r2 = cross(normal, dpx);
           float det = dot(dpx, r1);
           vec3 grad = sign(det) * (dhx * r1 + dhy * r2);
-          normal = normalize(abs(det) * normal - grad * 0.9 * wearAmt.w);
+          normal = normalize(abs(det) * normal - grad * 0.35 * wearAmt.w);
         }`)
       .replace("#include <roughnessmap_fragment>", /* glsl */ `#include <roughnessmap_fragment>
         {
@@ -52,7 +52,7 @@ function addWear(mat, { scale = 60, scratches = 0, grease = 0, edge = 0, weave =
           diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 2.6 + 0.045, clamp(scr * wearAmt.x * 0.7 + worn, 0.0, 1.0));
           // tejido: trama cruzada + pelusa clara en ángulos rasantes
           if (wearAmt.w > 0.0) {
-            float wv = wfbm(wp * 6.0) - 0.5;
+            float wv = wfbm(wp * 0.8) - 0.5;
             diffuseColor.rgb *= 1.0 + wv * 0.30 * wearAmt.w + (big - 0.5) * 0.5 * wearAmt.w;
             float fres = pow(1.0 - saturate(dot(normalize(vViewPosition), normalize(vNormal))), 3.0);
             diffuseColor.rgb += fres * 0.06 * wearAmt.w;

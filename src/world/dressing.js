@@ -78,8 +78,12 @@ export function urbanClutter(collider, zones, { density = 1, seed = 4242 } = {})
 }
 
 // [modelo, peso, escala min, max, ¿alinear a la pendiente?]
-const FOREST_BURNT = [["dry_branches_medium_01", 4, 0.8, 1.3, 1], ["dead_tree_trunk", 1.2, 0.8, 1.1, 1], ["dead_tree_trunk_02", 1.2, 0.8, 1.1, 1], ["bark_debris_01", 3, 0.7, 1.2, 1], ["single_root", 2, 0.8, 1.3, 1], ["root_cluster_02", 1, 0.6, 1.0, 1], ["stone_01", 3, 0.6, 1.3, 1], ["rock_07", 1, 0.3, 0.6, 0], ["rock_09", 1, 0.3, 0.6, 0]];
-const FOREST_DARK = [["fern_02", 9, 0.8, 1.4, 0], ["nettle_plant", 4, 0.7, 1.2, 0], ["shrub_04", 2, 0.5, 0.9, 0], ["single_root", 2, 0.8, 1.3, 1], ["pine_roots", 1, 0.7, 1.1, 1], ["stone_01", 3, 0.6, 1.3, 1], ["rock_09", 1.5, 0.3, 0.7, 0], ["tree_stump_02", 0.6, 0.7, 1.1, 0], ["bark_debris_01", 1.5, 0.7, 1.2, 1]];
+// Las versiones *_lod son simplificaciones (~5k triángulos) de los originales de Poly Haven (60–340k): se instancian
+// cientos de veces, así que cada zona tiene además un presupuesto de triángulos (TRI_BUDGET × density).
+const TRI = { fern_02: 6232, nettle_plant_lod: 9386, shrub_04_lod: 8114 };
+const TRI_BUDGET = { dark: 2.2e6, burnt: 2.4e6 };
+const FOREST_BURNT = [["dry_branches_medium_01_lod", 7, 0.8, 1.3, 1], ["dead_tree_trunk_lod", 1.2, 0.8, 1.1, 1], ["dead_tree_trunk_02_lod", 1.2, 0.8, 1.1, 1], ["bark_debris_01_lod", 3, 0.7, 1.2, 1], ["single_root_lod", 2, 0.8, 1.3, 1], ["root_cluster_02_lod", 1, 0.6, 1.0, 1], ["stone_01_lod", 3, 0.6, 1.3, 1], ["rock_07_lod", 1, 0.3, 0.6, 0], ["rock_09_lod", 1, 0.3, 0.6, 0]];
+const FOREST_DARK = [["fern_02", 9, 0.8, 1.4, 0], ["nettle_plant_lod", 4, 0.7, 1.2, 0], ["shrub_04_lod", 2, 0.5, 0.9, 0], ["single_root_lod", 2, 0.8, 1.3, 1], ["pine_roots_lod", 1, 0.7, 1.1, 1], ["stone_01_lod", 3, 0.6, 1.3, 1], ["rock_09_lod", 1.5, 0.3, 0.7, 0], ["tree_stump_02_lod", 0.6, 0.7, 1.1, 0], ["bark_debris_01_lod", 1.5, 0.7, 1.2, 1]];
 
 export async function forestFloor(world, assets, { density = 1, seed = 777 } = {}) {
   const r = rng(seed);
@@ -93,8 +97,10 @@ export async function forestFloor(world, assets, { density = 1, seed = 777 } = {
     const dark = /oscuro/.test(z.name);
     const list = dark ? FOREST_DARK : FOREST_BURNT;
     const area = (z.max[0] - z.min[0]) * (z.max[2] - z.min[2]);
-    const n = Math.round(area * (dark ? 0.32 : 0.11) * density);
-    for (let i = 0; i < n; i++) {
+    const n = Math.round(area * (dark ? 0.32 : 0.16) * density);
+    let tris = 0;
+    const budget = (dark ? TRI_BUDGET.dark : TRI_BUDGET.burnt) * density;
+    for (let i = 0; i < n && tris < budget; i++) {
       // agrupado: la mitad de los objetos nace junto a un tronco (raíces, helechos al pie del árbol)
       let x, zz;
       if (trunks.length && r() < 0.5) { const t = trunks[Math.floor(r() * trunks.length)]; const a = r() * 6.283, d = t.r + 0.2 + r() * 1.6; x = t.x + Math.cos(a) * d; zz = t.z + Math.sin(a) * d; }
@@ -103,6 +109,7 @@ export async function forestFloor(world, assets, { density = 1, seed = 777 } = {
       if (trunks.some((t) => (t.x - x) ** 2 + (t.z - zz) ** 2 < (t.r + 0.1) ** 2)) continue;
       const y = world.collider.groundY(x, 40, zz, 80); if (!isFinite(y)) continue;
       const it = pick(r, list);
+      tris += TRI[it[0]] || 5000;
       const s = it[2] + r() * (it[3] - it[2]);
       e.set(0, r() * 6.283, 0); q.setFromEuler(e);
       if (it[4]) {   // inclinar según la pendiente del terreno
