@@ -73,8 +73,8 @@ function makeTorchCookie() {
   gr.addColorStop(0.0, "rgb(255,255,255)");
   gr.addColorStop(0.16, "rgb(255,252,244)");
   gr.addColorStop(0.24, "rgb(150,146,138)");
-  gr.addColorStop(0.40, "rgb(92,90,86)");
-  gr.addColorStop(0.50, "rgb(108,106,100)");     // anillo del reflector
+  gr.addColorStop(0.40, "rgb(98,96,92)");
+  gr.addColorStop(0.50, "rgb(102,100,96)");      // anillo del reflector (suave)
   gr.addColorStop(0.58, "rgb(40,39,38)");
   gr.addColorStop(0.92, "rgb(14,14,15)");        // derrame (spill)
   gr.addColorStop(1.0, "rgb(0,0,0)");
@@ -82,7 +82,7 @@ function makeTorchCookie() {
   // imperfecciones: sombra del LED y anillos finos
   g.globalCompositeOperation = "multiply";
   for (let i = 0; i < 5; i++) {
-    g.strokeStyle = `rgba(${150 + i * 15},${150 + i * 15},${150 + i * 15},1)`;
+    g.strokeStyle = `rgba(${215 + i * 8},${215 + i * 8},${215 + i * 8},1)`;
     g.lineWidth = 1.5; g.beginPath(); g.arc(128 + (i % 2 ? 2 : -2), 128, 30 + i * 17, 0, 6.2832); g.stroke();
   }
   g.fillStyle = "rgba(170,170,170,1)"; g.fillRect(124, 122, 8, 12);

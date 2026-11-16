@@ -17,7 +17,7 @@ for (const c of CAMS) {
   if (only && !only.includes(c.name)) continue;
   const t0 = Date.now();
   await p.evaluate((c) => { const g = window.__game; g.setRunning(true); g.player.spawn(c.pos, c.yaw, c.pitch || 0);
-    if (c.torch && !g.vm.torchOn) g.vm.toggleTorch?.(); if (!c.torch && g.vm.torchOn) g.vm.toggleTorch?.();
+    const wantTorch = c.torch !== false; if (wantTorch !== !!g.vm.torchOn) g.vm.toggleTorch?.();
     g.input.buttons = c.ads ? 4 : 0; g.engine.post.resetAdaptation?.(); g.step(c.steps || 12, 1 / 20); g.step(4, 1 / 60); }, c);
   // la captura de página se cuelga con render por software: leemos el canvas en la misma tarea que el render
   const url = await p.evaluate(() => { window.__game.step(1, 1 / 60); return document.getElementById('game').toDataURL('image/png'); });

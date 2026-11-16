@@ -31,6 +31,7 @@ export const LOOK_CONTROLS = [
   ["reflections", "reflejos en suelo mojado (SSR)", 0, 2, 0.05, "post"],
   ["ao", "oclusión ambiental (SSAO)", 0, 1.5, 0.05, "post"],
   ["ATMÓSFERA"],
+  ["sunny", "sol en zonas urbanas (0 = nublado)", 0, 1, 0.05, "post"],
   ["haze", "neblina / haze", 0, 3, 0.05, "atmo"],
   ["volumetric", "conos de luz volumétricos", 0, 3, 0.05, "atmo"],
   ["dust", "polvo en suspensión", 0, 3, 0.05, "atmo"],

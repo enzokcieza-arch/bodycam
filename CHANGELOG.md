@@ -76,6 +76,17 @@ godrays, wetness, grime, emergency.
 - Slider LOOK `reflections`; `sensorGain` 1.15 para que el cielo nublado se queme a blanco como en las referencias.
 - Arma y brazos excluidos de los artefactos de compresión; relieve de tela de mangas y guantes a menor frecuencia.
 
+### Noche de terror permanente
+- Cielo nocturno nublado (Poly Haven `kloppenheim_07_puresky`, CC0), normalizado a una luminancia fija; luna
+  fría y débil como única luz direccional con sombras; neblina casi negra más densa.
+- Exposición nocturna de bodycam: luminancia objetivo 0.075 y ganancia máxima ×9 (más grano y croma, como una
+  cámara real de noche). GI horneada de día atenuada al 3.5 %.
+- `src/world/nightlights.js`: balizas rojas giratorias colocadas solas en los muros, carteles rojos de
+  SALIDA/EXIT con neón que falla, bengalas rojas en el suelo de exteriores y bosques con llama parpadeante.
+- Fluorescentes: ~25 % fundidos, ~45 % parpadeando, color frío, al 30 % de intensidad. Pool de luces 3/6/8.
+- Linterna encendida al empezar, intensidad recalibrada, cookie más suave, dispersión en niebla sin patrón.
+- Se retira el experimento de cielo soleado por zonas.
+
 ### Pendiente
 - NPC/operadores y brazos/arma de alta calidad: los candidatos CC-BY están en Sketchfab (requiere token válido).
 - Sombras de contacto en brazos.

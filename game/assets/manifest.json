@@ -264,7 +264,8 @@
  },
  "hdri": {
   "env": "hdri/kloofendal_overcast_puresky_2k.hdr",
-  "sunny": "hdri/kloofendal_48d_partly_cloudy_puresky_2k.hdr"
+  "sunny": "hdri/kloofendal_48d_partly_cloudy_puresky_2k.hdr",
+  "night": "hdri/kloppenheim_07_puresky_2k.hdr"
  },
  "decals": {
   "GraffitiSet001": [
@@ -402,6 +403,7 @@
   "Poly Haven · industrial_storage_cart (CC0)",
   "Poly Haven · plastic_jerrycan (CC0)",
   "Poly Haven · sofa_02 (CC0)",
-  "Poly Haven · metal_stool_02 (CC0)"
+  "Poly Haven · metal_stool_02 (CC0)",
+  "Poly Haven HDRI · kloppenheim_07_puresky (CC0)"
  ]
 }

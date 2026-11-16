@@ -3,6 +3,7 @@ import { V as P, aC as M0, aH as Vr, aI as Br, aJ as Ir, ar as k0, j as Fr, l as
 import { Gr } from "./core/engine.js";
 import { LookPanel } from "./ui/lookpanel.js";
 import { Atmosphere } from "./world/atmosphere.js";
+import { NightLights } from "./world/nightlights.js";
 import { autoGraffiti } from "./world/autograffiti.js";
 import { forestFloor } from "./world/dressing.js";
 import { markReflective } from "./render/ssr.js";
@@ -77,41 +78,58 @@ const Wa = {
       (this._h = setTimeout(() => (X("hint").textContent = ""), t)));
   },
 };
-async function yh() {
-  us(0.05, "Cielo HDRI (Poly Haven, CC0)…");
-  const a = await Ge.loadHDRI(Ge.manifest.hdri.env),
-    t = new Fr(E.renderer),
-    e = t.fromEquirectangular(a).texture;
-  ((E.scene.environment = e),
-    (E.scene.background = a),
-    (E.scene.backgroundIntensity = 1),
-    (E.scene.environmentIntensity = 0.82),
-    t.dispose());
+// dirección del sol = píxel más brillante del HDRI (si el cielo es nublado y no hay pico claro: dirección por defecto)
+function sunFromHDRI(a) {
   const { data: o, width: s, height: i } = a.image;
   let n = 0,
     r = 0;
   const l = o.length / (s * i),
     u = o instanceof Uint16Array ? M0.fromHalfFloat : (b) => b;
   for (let b = 0; b < s * i; b += 3) {
-    const v =
-      u(o[b * l]) * 0.2126 +
-      u(o[b * l + 1]) * 0.7152 +
-      u(o[b * l + 2]) * 0.0722;
+    const v = u(o[b * l]) * 0.2126 + u(o[b * l + 1]) * 0.7152 + u(o[b * l + 2]) * 0.0722;
     v > n && ((n = v), (r = b));
   }
-  const h = r % s,
-    c = Math.floor(r / s),
-    d = (h + 0.5) / s,
-    p = 1 - (c + 0.5) / i,
-    f = (d - 0.5) * Math.PI * 2,
-    g = (p - 0.5) * Math.PI;
-  let m = new P(
-    Math.cos(g) * Math.cos(f),
-    Math.sin(g),
-    Math.cos(g) * Math.sin(f),
-  );
+  const f = (((r % s) + 0.5) / s - 0.5) * Math.PI * 2,
+    g = (1 - (Math.floor(r / s) + 0.5) / i - 0.5) * Math.PI;
+  const m = new P(Math.cos(g) * Math.cos(f), Math.sin(g), Math.cos(g) * Math.sin(f));
   ((m.y < 0.25 || n < 20) && m.set(0.45, 0.72, 0.35), m.normalize());
-  const w = new Br(15002354, 0.5),
+  return { dir: m, peak: n };
+}
+// v3.0 — NOCHE PERMANENTE (modo terror). Cielo nocturno nublado de Poly Haven, luna fría y débil como única luz
+// direccional, neblina oscura. La exposición nocturna y la atenuación de las sondas de GI (horneadas de día) se
+// aplican en NIGHT más abajo.
+const NIGHT = {
+  skyLum: 0.012,      // luminancia media a la que se normaliza el cielo (unidades de escena; el día nublado ≈ 1)
+  envI: 0.9,          // intensidad del entorno (IBL) relativa a esa normalización
+  moon: 0.16,         // intensidad de la luna (luz direccional con sombras)
+  moonColor: 0x9db4dc,
+  probes: 0.035,      // GI horneada de día → luz de luna/rebote residual
+  fog: 0x0b0e13,
+  fogDensity: 0.03,
+  key: 0.075,         // luminancia objetivo de la auto-exposición (día: 0.21) → la noche se ve oscura
+  maxExp: 9,          // ganancia máxima del sensor (día: 3.4); más ganancia = más grano y ruido de croma
+};
+async function yh() {
+  us(0.05, "Cielo nocturno (Poly Haven, CC0)…");
+  const t = new Fr(E.renderer);
+  const a = await Ge.loadHDRI(Ge.manifest.hdri.night || Ge.manifest.hdri.env);
+  // normalizar el brillo del cielo nocturno (los HDRI de noche vienen con exposiciones muy distintas)
+  {
+    const { data: o, width: w, height: h } = a.image;
+    const l = o.length / (w * h), u = o instanceof Uint16Array ? M0.fromHalfFloat : (b) => b;
+    let sum = 0, n = 0;
+    for (let i = 0; i < w * (h >> 1); i += 7) { sum += u(o[i * l]) * 0.2126 + u(o[i * l + 1]) * 0.7152 + u(o[i * l + 2]) * 0.0722; n++; }
+    NIGHT.skyScale = NIGHT.skyLum / Math.max(1e-6, sum / n);
+  }
+  const e = t.fromEquirectangular(a).texture;
+  ((E.scene.environment = e),
+    (E.scene.background = a),
+    (E.scene.backgroundIntensity = NIGHT.skyScale),
+    (E.scene.environmentIntensity = NIGHT.skyScale * NIGHT.envI),
+    t.dispose());
+  const m = sunFromHDRI(a).dir;
+  m.y < 0.35 && ((m.y = 0.55), m.normalize());
+  const w = new Br(NIGHT.moonColor, NIGHT.moon),
     y = new P(4.5, 0, 6);
   (w.position.copy(y).addScaledVector(m, 70),
     w.target.position.copy(y),
@@ -128,17 +146,14 @@ async function yh() {
     w.shadow.mapSize.set(E.quality.shadow, E.quality.shadow),
     (w.shadow.bias = -4e-4),
     (w.shadow.normalBias = 0.03),
-    (w.shadow.radius = 6),
+    (w.shadow.radius = 4),
     (w.shadow.autoUpdate = !1),
     E.scene.add(w, w.target),
     (E.sun = w),
-    (E.scene.fog = new Ir(9344411, 0.014)),
-    console.info(
-      "[env] sol",
-      m.toArray().map((b) => b.toFixed(2)),
-      "pico HDR",
-      n.toFixed(0),
-    ));
+    (E.scene.fog = new Ir(NIGHT.fog, NIGHT.fogDensity)),
+    // exposición nocturna de bodycam
+    E.post.setNight?.(NIGHT),
+    console.info("[env] noche · escala cielo", NIGHT.skyScale.toExponential(2), "· luna", m.toArray().map((b) => b.toFixed(2))));
 }
 async function xh() {
   try {
@@ -153,6 +168,7 @@ async function xh() {
       (ue = new Bc(E, Ge)),
       await ue.build((t) => us(null, t)),
       (ue.atmosphere = new Atmosphere(E, ue)),
+      (night = new NightLights(E, ue, E.quality.night || {})),
       autoGraffiti(ue, E.quality.autoGraffiti || 0),
       us(null, "Sotobosque (Poly Haven, CC0)…"),
       await forestFloor(ue, Ge, { density: E.quality.forest ?? 1 }));
@@ -164,6 +180,7 @@ async function xh() {
     (us(0.7, "Arma y brazos…"),
       (le = await new Nc(E, Ge).load()),
       (gfx = enhanceViewmodel(le, E, { redDot: !Xa.has("noreddot") })),
+      (le.torchOn = !0),
       (xt = new Xc(E, ue, Be)),
       (_t = new Uc(E, ue, Dt, Be)),
       (de = new uh(E, ue, _t, le, xt, Be, Wa)),
@@ -204,6 +221,7 @@ async function xh() {
             ex.length && markReflective(mat, ex.reduce((a, b) => `max(${a}, ${b})`));
           }
         })(),
+      wo?.uniforms && (wo.uniforms.lpIntensity.value = NIGHT.probes),
       us(0.86, "Precompilando shaders/pipelines…"),
       (le.flash.visible = !0),
       (le.flashLight.intensity = 1),
@@ -264,7 +282,7 @@ function Za() {
     (It.dynres = X("opt-dynres").checked),
     wh(),
     (E.post.params.fisheye = It.fisheye),
-    (E.post.params.exposureBias = 0.66),
+    (E.post.params.exposureBias = 1),
     (E.post.params.blackCrush = look?.saved?.blackCrush ?? 1.05),
     _t && (_t.sens = It.sens),
     Be.setVolume(It.vol),
@@ -383,6 +401,7 @@ function Qa(a) {
     J.begin("mundo/luces"),
     ue.updateLights(E.camera.position, e),
     ue.atmosphere.update(e, E.camera, le, Ca),
+    night?.update(e),
     WG_UNIFORMS.wgParams.value.set(ue.atmosphere.params.wetness, ue.atmosphere.params.grime, 0),
     ue.trees?.update?.(E.camera, e),
     (Oa -= e),
@@ -404,7 +423,7 @@ function Qa(a) {
         : 0.08 + 0.92 * qs(ue.collider.bvh, E.camera.position, 24)));
     const s = ue.zoneAt(_t.pos);
     (Be.setEnvironment(s ? s.type : "outdoor"),
-      (E.post.params.exposureBias = !s ? 0.66 : /oscuro/.test(s.name) ? 0.34 : /quemado/.test(s.name) ? 0.34 : s.type === "indoor" ? 0.8 : s.type === "semi" ? 0.85 : 0.66));
+      (E.post.params.exposureBias = s && /bosque/.test(s.name) ? 0.85 : 1));
   }
   (le.update(e, _t, Vo[0], Vo[1], wo ? 1 : Ca),
     updateGunFx(gfx, le, E.camera),
@@ -441,7 +460,8 @@ function Qa(a) {
       s.toISOString().slice(0, 19).replace("T", " T") + "Z";
   }
 }
-let gfx = null;
+let gfx = null,
+  night = null;
 let breathV = 0,
   adsPrev = 0;
 let Si = 0,
@@ -477,6 +497,9 @@ window.__game = {
   },
   look,
   input: Dt,
+  get night() {
+    return night;
+  },
   get gfx() {
     return gfx;
   },

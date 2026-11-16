@@ -34,15 +34,27 @@ export class Atmosphere {
     const q = engine.quality;
     // ── luces de emergencia: entran en el mismo pool de luces puntuales cercanas que los fluorescentes
     this.emergency = EMERGENCY_LIGHTS.map(([x, y, z, ph]) => {
-      const spec = { pos: [x, y - 0.12, z], color: 0xff1a0c, intensity: 0, distance: 5.5, flicker: 0, zone: "indoor", emergency: true, base: 1.8, phase: ph };
+      const spec = { pos: [x, y - 0.12, z], color: 0xff1a0c, intensity: 0, distance: 5.5, flicker: 0, zone: "indoor", emergency: true, base: 0.6, phase: ph };
       world.lightSpecs.push(spec);
       return spec;
     });
     world._sorted = null;
+    {
+      let sd = 99;
+      const rr = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+      for (const s of world.lightSpecs) {
+        if (s.emergency) continue;
+        const u = rr();
+        if (u < 0.25) { s.dead = true; s.intensity = 0; }
+        else if (u < 0.7) s.flicker = 1;
+        s.color = 0xd6efe6;
+        s.intensity *= 0.3;   // calibradas de día: de noche, con la ganancia del sensor, se quemaban
+      }
+    }
 
     // ── luminarias emisivas (alimentan bloom, halación y suciedad de lente): un tubo por fluorescente,
     //    una carcasa roja por baliza. InstancedMesh + instanceColor en HDR.
-    const specs = world.lightSpecs;
+    const specs = world.lightSpecs.slice();   // copia: las luces nocturnas se añaden después y tienen su propia malla
     this.fixtureSpecs = specs;
     const geo = new BoxGeometry(1, 1, 1);
     const mat = new MeshBasicMaterial({ color: 0xffffff, fog: false });
@@ -137,8 +149,8 @@ export class Atmosphere {
     const specs = this.fixtureSpecs;
     for (let i = 0; i < specs.length; i++) {
       const s = specs[i];
-      const lvl = s.emergency ? s.intensity / s.base : (s.flicker ? (s._lvl ?? 1) : 1);
-      _c.setHex(s.color).multiplyScalar(s.emergency ? 5 * lvl : 7 * lvl);
+      const lvl = s.dead ? 0 : s.emergency ? s.intensity / s.base : (s.flicker ? (s._lvl ?? 1) : 1);
+      _c.setHex(s.color).multiplyScalar(s.emergency ? 3 * lvl : 2.5 * lvl);
       this.fixtures.setColorAt(i, _c);
       if (s.flicker) s._lvl = 1;     // se recalcula solo mientras está en el pool
     }
@@ -150,13 +162,13 @@ export class Atmosphere {
     if (engine.scene.fog) {
       this.fogColor0 || (this.fogColor0 = engine.scene.fog.color.clone());
       engine.scene.fog.density = this.fogBase * (0.30 + 0.25 * params.haze);
-      engine.scene.fog.color.copy(this.fogColor0).multiplyScalar(0.10 + 0.90 * ambient);
+      engine.scene.fog.color.copy(engine.post.atmo.skyFog || this.fogColor0).multiplyScalar(0.10 + 0.90 * ambient);
     }
 
     // datos para el pase volumétrico
     const atmo = engine.post.atmo;
     atmo.enabled = params.haze > 0 || params.volumetric > 0;
-    atmo.density = 0.06 * params.volumetric * (0.4 + 0.6 * params.haze);
+    atmo.density = 0.09 * params.volumetric * (0.4 + 0.6 * params.haze);
     atmo.lights = world.dynamicLights;
     atmo.haze = 0.005 * params.haze;
     atmo.godrays = params.godrays;

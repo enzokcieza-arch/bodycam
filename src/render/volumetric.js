@@ -56,7 +56,8 @@ export const volFrag = (common) => /* glsl */ `
 
     #if VOL_TORCH
     if (torchCol.r + torchCol.g + torchCol.b > 0.0) {
-      float jit = ign(gl_FragCoord.xy + fract(time * 3.7) * 61.0);
+      // ruido blanco (no IGN): el patrón entrelazado de IGN se veía como una malla diagonal dentro del haz
+      float jit = fract(sin(dot(gl_FragCoord.xy + fract(time * 3.7) * 61.0, vec2(12.9898, 78.233))) * 43758.5453);
       float Tt = min(T, 16.0), dt = Tt / float(VOL_STEPS);
       vec3 s = vec3(0.0);
       for (int i = 0; i < VOL_STEPS; i++) {

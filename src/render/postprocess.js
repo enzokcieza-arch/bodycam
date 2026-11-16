@@ -453,6 +453,13 @@ class Er {
     this.ssrRT && this.ssrRT.setSize(Math.max(1, t >> 1), Math.max(1, e >> 1));
     this.resizeCount = (this.resizeCount || 0) + 1;
   }
+  // v3.0: exposición nocturna de bodycam (luminancia objetivo baja y más ganancia máxima → oscuro con grano)
+  setNight(N) {
+    this.adaptMat.uniforms.key.value = N.key;
+    this.adaptMat.uniforms.expRange.value.set(0.25, N.maxExp);
+    this.atmo.sunCol.set(0.35, 0.42, 0.6).multiplyScalar(N.moon);
+    this.night = N;
+  }
   resetAdaptation() {
     this.snapAdapt = !0;
   }
@@ -550,7 +557,7 @@ class Er {
         T.target.getWorldPosition(_v3);
         V.torchDir.value.copy(_v3).sub(V.torchPos.value).normalize().transformDirection(vi);
         V.torchPos.value.applyMatrix4(vi);
-        V.torchCol.value.set(T.color.r, T.color.g, T.color.b).multiplyScalar(T.intensity * 0.07);
+        V.torchCol.value.set(T.color.r, T.color.g, T.color.b).multiplyScalar(T.intensity * 0.025);
         V.torchCone.value.set(Math.cos(T.angle), Math.cos(T.angle * (1 - T.penumbra)));
       } else V.torchCol.value.set(0, 0, 0);
       V.sunCol.value.copy(A.sunCol);
@@ -660,7 +667,7 @@ const LOOK_DEFAULTS = {
   halation: 1,
   veil: 1,
   lensDirt: 1,
-  compression: 0.6,
+  compression: 0.35,
   rollingShutter: 1,
   chromaGrain: 0.8,
   saturation: 1.25,
@@ -683,7 +690,8 @@ const Wr = new B(),
       msaa: 0,
       shadow: 1024,
       bloomLevels: 3,
-      pointLights: 2,
+      pointLights: 3,
+      night: { beacons: 8, exits: 4, flares: 6 },
       vegetation: 0.4,
       aniso: 2,
       motionBlur: !1,
@@ -712,7 +720,8 @@ const Wr = new B(),
       msaa: 4,
       shadow: 2048,
       bloomLevels: 4,
-      pointLights: 4,
+      pointLights: 6,
+      night: { beacons: 14, exits: 6, flares: 10 },
       vegetation: 1,
       aniso: 4,
       motionBlur: !0,
@@ -726,7 +735,7 @@ const Wr = new B(),
       compression: !0,
       volumetric: !0,
       godrays: !0,
-      volSteps: 8,
+      volSteps: 14,
       ssr: !0,
       ssrSteps: 24,
       dust: 450,
@@ -742,7 +751,8 @@ const Wr = new B(),
       msaa: 4,
       shadow: 4096,
       bloomLevels: 5,
-      pointLights: 6,
+      pointLights: 8,
+      night: { beacons: 18, exits: 8, flares: 14 },
       vegetation: 1.5,
       aniso: 8,
       motionBlur: !0,
@@ -756,7 +766,7 @@ const Wr = new B(),
       compression: !0,
       volumetric: !0,
       godrays: !0,
-      volSteps: 14,
+      volSteps: 20,
       ssr: !0,
       ssrSteps: 40,
       dust: 1100,
