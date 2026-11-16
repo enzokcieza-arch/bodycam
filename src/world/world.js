@@ -4,6 +4,7 @@ import { dn } from "../level/builder.js";
 import { $i, Ba, Le, kl } from "../level/area-urbex.js";
 import { Bl, Fl, Ll, Rl, Vl, qs } from "./geometry-utils.js";
 import { Jl, Ql } from "./trees.js";
+import { urbanClutter } from "./dressing.js";
 import { ac, cc, ji } from "./ground-scatter.js";
 import { Cc, Fc, Oc, Rc, Vc, Xn, Zn, da } from "./graffiti.js";
 
@@ -89,6 +90,8 @@ class Bc {
     const l = [],
       u = new sn(n);
     this.propRoots = [];
+    this.engine.quality.clutter > 0 &&
+      s.props.push(...urbanClutter(u, this.zones, { density: this.engine.quality.clutter }));
     const h = [...new Set(s.props.map((f) => f.model))],
       c = new Map();
     await Promise.all(
@@ -119,10 +122,16 @@ class Bc {
         M.userData.surface = m.userData.surface;
         const S = (Array.isArray(M.material) ? M.material : [M.material]).map(
           (T) => {
-            const A = T.uuid + "|" + b;
+            const A = T.uuid + "|" + b + (f.dress ? "|d" : "");
             if (!d.has(A)) {
               const z = T.clone();
               ((z.envMapIntensity = b), d.set(A, z));
+              // desorden añadido (dressing.js): polvo y abandono → menos saturado, más oscuro y mate
+              if (f.dress && z.color) {
+                const lum = z.color.r * 0.2126 + z.color.g * 0.7152 + z.color.b * 0.0722;
+                z.color.lerp({ r: lum, g: lum, b: lum, isColor: !0 }, 0.45).multiplyScalar(0.72);
+                z.roughness = Math.min(1, (z.roughness ?? 1) * 1.2 + 0.08);
+              }
             }
             return d.get(A);
           },

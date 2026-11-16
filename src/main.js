@@ -4,6 +4,7 @@ import { Gr } from "./core/engine.js";
 import { LookPanel } from "./ui/lookpanel.js";
 import { Atmosphere } from "./world/atmosphere.js";
 import { autoGraffiti } from "./world/autograffiti.js";
+import { forestFloor } from "./world/dressing.js";
 import { enhanceViewmodel, updateGunFx } from "./weapon/gunfx.js";
 import { Nr } from "./core/input.js";
 import { Hr } from "./core/perf.js";
@@ -151,7 +152,9 @@ async function xh() {
       (ue = new Bc(E, Ge)),
       await ue.build((t) => us(null, t)),
       (ue.atmosphere = new Atmosphere(E, ue)),
-      autoGraffiti(ue, E.quality.autoGraffiti || 0));
+      autoGraffiti(ue, E.quality.autoGraffiti || 0),
+      us(null, "Sotobosque (Poly Haven, CC0)…"),
+      await forestFloor(ue, Ge, { density: E.quality.forest ?? 1 }));
     try {
       wo = await F0.load(`${k0}bake/probes-${$i}.bin`);
     } catch (t) {

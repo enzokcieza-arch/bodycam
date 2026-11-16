@@ -93,5 +93,16 @@
   "torch": true,
   "extra": true,
   "steps": 30
+ },
+ {
+  "name": "10-sala-pb",
+  "pos": [
+   -6,
+   0,
+   -16
+  ],
+  "yaw": 3.6,
+  "pitch": -0.08,
+  "extra": true
  }
 ]
