@@ -206,7 +206,8 @@ class Uc {
     )
       (!d &&
         h < -3 &&
-        ((this.landVel = Math.min(0.16, -h * 0.016)),
+        // v3.0: impulso del hundimiento al aterrizar (m/s, ver el muelle en update)
+        ((this.landVel = Math.min(2.4, -h * 0.42)),
         (this.landSpring.v -= Math.min(2.2, -h * 0.28)),
         (this.shotSpring.v.x -= Math.min(1.2, -h * 0.1)),
         (this.shotSpring.v.z += (Math.random() - 0.5) * Math.min(1, -h * 0.08)),
@@ -307,10 +308,7 @@ class Uc {
     (this.stepSpring.update(t),
       this.shotSpring.update(t),
       this.landSpring.update(t),
-      (this.landKick += this.landVel),
-      (this.landVel -= this.landKick * t * 120),
-      (this.landVel *= Math.exp(-t * 10)),
-      (this.landKick *= Math.exp(-t * 4)));
+      this.updateLandKick(t));
     const b = this.bobAmp,
       v = this.bobPhase,
       M = Math.sin(v),
@@ -369,6 +367,18 @@ class Uc {
       ),
       (this._st = (this._st || 0) + t) > 0.2 &&
         ((this._st = 0), (this.surface = this.surfaceBelow())));
+  }
+  // Hundimiento de cámara al aterrizar: muelle casi crítico integrado por tiempo (sub-pasos de 1/240 s).
+  // Antes se integraba "por frame" y quedaba poco amortiguado: la cámara vibraba ±6 cm a ~15 Hz durante medio
+  // segundo tras cada salto, y con otra frecuencia según los fps de la pantalla.
+  updateLandKick(t) {
+    const w = 13, z = 0.85;
+    let n = Math.max(1, Math.ceil(t / (1 / 240)));
+    const h = t / n;
+    for (; n > 0; n--) {
+      this.landVel += (-w * w * this.landKick - 2 * z * w * this.landVel) * h;
+      this.landKick += this.landVel * h;
+    }
   }
   _mixKey(t) {
     const e = jt.walk,
