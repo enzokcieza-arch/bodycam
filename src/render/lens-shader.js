@@ -121,7 +121,8 @@ export const finalFrag = (common) => /* glsl */ `
                       + texture2D(tScene, uvB + vec2(o4.x, -o4.y)).rgb + texture2D(tScene, uvB + vec2(-o4.x, o4.y)).rgb);
       float lc = luma(col), lb = luma(cb);
       float dark = 1.0 - smoothstep(0.0, 0.22, lc * exposure);
-      float k = compression * clamp(0.10 + 0.45 * dark + mv, 0.0, 1.0);
+      // el arma y los brazos (< 1 m) ocupan muchos bloques y delatan el artefacto: casi sin compresión ahí
+      float k = compression * clamp(0.10 + 0.45 * dark + mv, 0.0, 1.0) * mix(0.12, 1.0, smoothstep(0.6, 1.2, zc));
       vec3 cc = cb * clamp(lc / max(lb, 1e-4), 0.0, 3.0);          // croma del bloque, luma propia
       col = mix(col, cc, min(1.0, k * 1.3));
       col = mix(col, cb, k * 0.40 * smoothstep(0.25, 1.0, mv + dark * 0.5));
@@ -222,9 +223,10 @@ export const finalFrag = (common) => /* glsl */ `
       vec2 bid = floor(vUv * res / 8.0);
       float dk = 1.0 - smoothstep(0.0, 0.24, lo);
       float bn = hash21(bid + floor(time * 15.0) * 7.13) - 0.5;
-      o += bn * 0.014 * compression * dk * (0.6 + min(mv, 1.0));
+      float nearVM = mix(0.15, 1.0, smoothstep(0.6, 1.2, zc));
+      o += bn * 0.014 * compression * dk * (0.6 + min(mv, 1.0)) * nearVM;
       float L = mix(56.0, 255.0, smoothstep(0.0, 0.30, lo));
-      o = mix(o, floor(o * L + 0.5) / L, clamp(compression * 0.8 * dk, 0.0, 1.0));
+      o = mix(o, floor(o * L + 0.5) / L, clamp(compression * 0.8 * dk * nearVM, 0.0, 1.0));
     }
     #endif
 

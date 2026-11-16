@@ -66,6 +66,16 @@ godrays, wetness, grime, emergency.
 - Pliegues y costuras procedurales (bump) en mangas y guantes.
 - Calidad: `clutter` 0.5/1/1.3 y `forest` 0.4/1/1.6 (baja/media/alta).
 
+### Suelo fotorrealista
+- Reflejos en espacio de pantalla (`src/render/ssr.js`) solo en superficies mojadas: los materiales de suelo
+  escriben su humedad como alfa negativo en el render HDR (sin G-buffer extra); pase a ½ resolución con trazado
+  contra la profundidad, refinamiento binario, ondas animadas en el agua y Fresnel. Los charcos reflejan troncos,
+  columnas y luces en vez de ser manchas blancas de cielo. Calidad media 24 pasos, alta 40, baja desactivado.
+- Charcos del bosque como espejo (rugosidad 0.05); suelo del bosque quemado aclarado a ceniza gris-parda;
+  menos micro-charcos POM y bordes húmedos más anchos.
+- Slider LOOK `reflections`; `sensorGain` 1.15 para que el cielo nublado se queme a blanco como en las referencias.
+- Arma y brazos excluidos de los artefactos de compresión; relieve de tela de mangas y guantes a menor frecuencia.
+
 ### Pendiente
 - NPC/operadores y brazos/arma de alta calidad: los candidatos CC-BY están en Sketchfab (requiere token válido).
 - Sombras de contacto en brazos.

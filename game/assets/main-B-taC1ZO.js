@@ -106,7 +106,8 @@ import{V as k,o as U,x as wn,y as ki,g as ee,p as eo,c as Nr,O as zi,i as to,a a
                       + texture2D(tScene, uvB + vec2(o4.x, -o4.y)).rgb + texture2D(tScene, uvB + vec2(-o4.x, o4.y)).rgb);
       float lc = luma(col), lb = luma(cb);
       float dark = 1.0 - smoothstep(0.0, 0.22, lc * exposure);
-      float k = compression * clamp(0.10 + 0.45 * dark + mv, 0.0, 1.0);
+      // el arma y los brazos (< 1 m) ocupan muchos bloques y delatan el artefacto: casi sin compresión ahí
+      float k = compression * clamp(0.10 + 0.45 * dark + mv, 0.0, 1.0) * mix(0.12, 1.0, smoothstep(0.6, 1.2, zc));
       vec3 cc = cb * clamp(lc / max(lb, 1e-4), 0.0, 3.0);          // croma del bloque, luma propia
       col = mix(col, cc, min(1.0, k * 1.3));
       col = mix(col, cb, k * 0.40 * smoothstep(0.25, 1.0, mv + dark * 0.5));
@@ -207,9 +208,10 @@ import{V as k,o as U,x as wn,y as ki,g as ee,p as eo,c as Nr,O as zi,i as to,a a
       vec2 bid = floor(vUv * res / 8.0);
       float dk = 1.0 - smoothstep(0.0, 0.24, lo);
       float bn = hash21(bid + floor(time * 15.0) * 7.13) - 0.5;
-      o += bn * 0.014 * compression * dk * (0.6 + min(mv, 1.0));
+      float nearVM = mix(0.15, 1.0, smoothstep(0.6, 1.2, zc));
+      o += bn * 0.014 * compression * dk * (0.6 + min(mv, 1.0)) * nearVM;
       float L = mix(56.0, 255.0, smoothstep(0.0, 0.30, lo));
-      o = mix(o, floor(o * L + 0.5) / L, clamp(compression * 0.8 * dk, 0.0, 1.0));
+      o = mix(o, floor(o * L + 0.5) / L, clamp(compression * 0.8 * dk * nearVM, 0.0, 1.0));
     }
     #endif
 
@@ -536,7 +538,7 @@ import{V as k,o as U,x as wn,y as ki,g as ee,p as eo,c as Nr,O as zi,i as to,a a
 `+Il).replace("#include <normal_fragment_maps>",`#include <normal_fragment_maps>
         // pliegues de tela / costuras (solo materiales con trama): bump procedural por derivadas de pantalla
         if (wearAmt.w > 0.0) {
-          vec3 fp = vObjPos * wearScale * 0.12;
+          vec3 fp = vObjPos * wearScale * 0.035;
           float hh = wfbm(vec3(fp.x * 0.6, fp.y * 0.6, fp.z * 2.4));
           hh += smoothstep(0.94, 1.0, abs(sin(fp.z * 1.1))) * 0.25;                // costuras transversales
           vec3 dpx = dFdx(-vViewPosition), dpy = dFdy(-vViewPosition);
@@ -544,7 +546,7 @@ import{V as k,o as U,x as wn,y as ki,g as ee,p as eo,c as Nr,O as zi,i as to,a a
           vec3 r1 = cross(dpy, normal), r2 = cross(normal, dpx);
           float det = dot(dpx, r1);
           vec3 grad = sign(det) * (dhx * r1 + dhy * r2);
-          normal = normalize(abs(det) * normal - grad * 0.35 * wearAmt.w);
+          normal = normalize(abs(det) * normal - grad * 0.22 * wearAmt.w);
         }`).replace("#include <roughnessmap_fragment>",`#include <roughnessmap_fragment>
         {
           vec3 wp = vObjPos * wearScale;
@@ -558,8 +560,8 @@ import{V as k,o as U,x as wn,y as ki,g as ee,p as eo,c as Nr,O as zi,i as to,a a
           diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * 2.6 + 0.045, clamp(scr * wearAmt.x * 0.7 + worn, 0.0, 1.0));
           // tejido: trama cruzada + pelusa clara en ángulos rasantes
           if (wearAmt.w > 0.0) {
-            float wv = wfbm(wp * 0.8) - 0.5;
-            diffuseColor.rgb *= 1.0 + wv * 0.30 * wearAmt.w + (big - 0.5) * 0.5 * wearAmt.w;
+            float wv = wfbm(wp * 0.035) - 0.5;
+            diffuseColor.rgb *= 1.0 + wv * 0.22 * wearAmt.w;
             float fres = pow(1.0 - saturate(dot(normalize(vViewPosition), normalize(vNormal))), 3.0);
             diffuseColor.rgb += fres * 0.06 * wearAmt.w;
           }
