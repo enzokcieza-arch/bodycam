@@ -513,7 +513,7 @@ class Er {
         T.target.getWorldPosition(_v3);
         V.torchDir.value.copy(_v3).sub(V.torchPos.value).normalize().transformDirection(vi);
         V.torchPos.value.applyMatrix4(vi);
-        V.torchCol.value.set(T.color.r, T.color.g, T.color.b).multiplyScalar(T.intensity * 0.5);
+        V.torchCol.value.set(T.color.r, T.color.g, T.color.b).multiplyScalar(T.intensity * 0.07);
         V.torchCone.value.set(Math.cos(T.angle), Math.cos(T.angle * (1 - T.penumbra)));
       } else V.torchCol.value.set(0, 0, 0);
       V.sunCol.value.copy(A.sunCol);

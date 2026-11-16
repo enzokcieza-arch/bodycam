@@ -157,8 +157,7 @@ async function xh() {
     }
     (us(0.7, "Arma y brazos…"),
       (le = await new Nc(E, Ge).load()),
-      (gfx = enhanceViewmodel(le, E, { redDot: Xa.has("reddot") })),
-      gfx.sightRise && (ne.ads.p[1] -= gfx.sightRise),
+      (gfx = enhanceViewmodel(le, E, { redDot: !Xa.has("noreddot") })),
       (xt = new Xc(E, ue, Be)),
       (_t = new Uc(E, ue, Dt, Be)),
       (de = new uh(E, ue, _t, le, xt, Be, Wa)),
@@ -386,7 +385,7 @@ function Qa(a) {
         : 0.08 + 0.92 * qs(ue.collider.bvh, E.camera.position, 24)));
     const s = ue.zoneAt(_t.pos);
     (Be.setEnvironment(s ? s.type : "outdoor"),
-      (E.post.params.exposureBias = s && /oscuro/.test(s.name) ? 0.5 : s && /quemado/.test(s.name) ? 0.55 : 0.8));
+      (E.post.params.exposureBias = s && /oscuro/.test(s.name) ? 0.5 : s && /quemado/.test(s.name) ? 0.34 : 0.8));
   }
   (le.update(e, _t, Vo[0], Vo[1], wo ? 1 : Ca),
     updateGunFx(gfx, le, E.camera),
@@ -458,6 +457,7 @@ window.__game = {
     return de;
   },
   look,
+  input: Dt,
   get gfx() {
     return gfx;
   },

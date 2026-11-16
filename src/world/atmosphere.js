@@ -9,7 +9,6 @@ import {
 export const EMERGENCY_LIGHTS = [
   [5.2, 3.2, -17.6, 0.0],     // salas PB norte
   [-5.5, 6.75, -13.9, 1.7],   // galería P1 norte (fondo del pasillo superior)
-  [14.2, 6.75, -13.9, 0.6],   // galería P1 norte, extremo este
   [-17.6, 6.75, -6.5, 2.3],   // galería P1 oeste
   [-19.9, 3.2, 6.5, 3.1],     // salas PB oeste / escalera
   [27.5, 2.9, -15.5, 0.9],    // edificio del callejón
@@ -35,7 +34,7 @@ export class Atmosphere {
     const q = engine.quality;
     // ── luces de emergencia: entran en el mismo pool de luces puntuales cercanas que los fluorescentes
     this.emergency = EMERGENCY_LIGHTS.map(([x, y, z, ph]) => {
-      const spec = { pos: [x, y - 0.12, z], color: 0xff1a0c, intensity: 0, distance: 6.5, flicker: 0, zone: "indoor", emergency: true, base: 1.8, phase: ph };
+      const spec = { pos: [x, y - 0.12, z], color: 0xff1a0c, intensity: 0, distance: 5.5, flicker: 0, zone: "indoor", emergency: true, base: 1.8, phase: ph };
       world.lightSpecs.push(spec);
       return spec;
     });

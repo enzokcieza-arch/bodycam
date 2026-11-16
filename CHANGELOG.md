@@ -37,6 +37,18 @@ godrays, wetness, grime, emergency.
 - low: sin volumétrica, polvo, suciedad de lente, compresión ni humedad/mugre.
 - medium / high: todo activo (high: más muestras, más polvo, sombras de linterna).
 
+### Fase 4 — arma (`src/weapon/gunfx.js`)
+- Mira de punto rojo procedural montada adelantada sobre el tubo de gases: punto colimado (sin paralaje, solo
+  visible a través del cristal) emitido en HDR para que el bloom le dé halo. `?noreddot` la quita.
+- Desgaste procedural (arañazos, grasa, borde gastado) en acero y madera; trama y pelusa en mangas y guantes.
+- Linterna con cookie y dispersión volumétrica calibrada. La pose de apuntado canteada de v2.5 no se toca.
+- Ya existían en v2.5 y se conservan: retroceso, casquillos, fogonazo con luz, humo.
+
+### Ajustes tras la primera revisión
+- Bosque quemado: exposición 0.34 en la zona (suelo oscuro, cielo quemado).
+- Follaje: alpha afilado con fwidth → adiós al tramado de puntos.
+- Balizas: menos alcance e intensidad; eliminada la del extremo este de la galería.
+
 ### Pendiente
-- Fase 4: mira red-dot (prototipo tras `?reddot`, escala y montaje sin ajustar), NPC/operadores.
+- NPC/operadores (sin modelo CC0 con esqueleto), sombras de contacto en brazos.
 - Fase 5: audio. Rebake de GI (el horneador no está en el repo). Medición real de fps en Mac.

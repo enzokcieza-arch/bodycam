@@ -178,12 +178,12 @@ export function enhanceViewmodel(vm, engine, opts = {}) {
     }
   }
 
-  // 3) mira red-dot sobre la tapa del cajón de mecanismos (Fase 4: ?reddot para probarla)
+  // 3) mira red-dot sobre la tapa del cajón de mecanismos (?noreddot la quita)
   if (opts.redDot) try {
     vm.root.updateMatrixWorld(true);
     const g = measureGun(vm);
     const len = g.zMax - g.zMin;
-    const zc = g.zMin + len * 0.60;                      // sobre la tapa, por detrás del alza
+    const zc = g.zMin + len * 0.36;                      // montaje adelantado sobre el tubo de gases (lejos de la bodycam)
     let top = -Infinity, xs = 0, n = 0;
     for (let i = 0; i < g.pts.length; i += 3) {
       const z = g.pts[i + 2];

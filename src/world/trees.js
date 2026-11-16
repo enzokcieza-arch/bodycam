@@ -1368,10 +1368,10 @@ uniform float uTreeTime;`,
           r &&
             (c.fragmentShader = c.fragmentShader.replace(
               "#include <alphatest_fragment>",
-              "if (diffuseColor.a < 0.04) discard;",
+              "diffuseColor.a = clamp((diffuseColor.a - 0.5) / max(fwidth(diffuseColor.a), 1e-4) + 0.5, 0.0, 1.0); if (diffuseColor.a < 0.04) discard;",
             )));
       }),
-      (u.customProgramCacheKey = () => "treeCards" + r),
+      (u.customProgramCacheKey = () => "treeCards2" + r),
       { decid: s, pine: i, burnt: n, cards: u }
     );
   }
