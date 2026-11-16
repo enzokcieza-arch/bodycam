@@ -4,3 +4,4 @@ shots/tmp/
 .DS_Store
 shots/after[0-9]*/
 dist/
+shots/night[0-9]*/
