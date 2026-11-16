@@ -3,6 +3,7 @@ import { V as P, aC as M0, aH as Vr, aI as Br, aJ as Ir, ar as k0, j as Fr, l as
 import { Gr } from "./core/engine.js";
 import { LookPanel } from "./ui/lookpanel.js";
 import { Atmosphere } from "./world/atmosphere.js";
+import { autoGraffiti } from "./world/autograffiti.js";
 import { enhanceViewmodel, updateGunFx } from "./weapon/gunfx.js";
 import { Nr } from "./core/input.js";
 import { Hr } from "./core/perf.js";
@@ -149,7 +150,8 @@ async function xh() {
       await yh(),
       (ue = new Bc(E, Ge)),
       await ue.build((t) => us(null, t)),
-      (ue.atmosphere = new Atmosphere(E, ue)));
+      (ue.atmosphere = new Atmosphere(E, ue)),
+      autoGraffiti(ue, E.quality.autoGraffiti || 0));
     try {
       wo = await F0.load(`${k0}bake/probes-${$i}.bin`);
     } catch (t) {
@@ -236,6 +238,7 @@ X("opt-fisheye").value = It.fisheye ?? 0.6;
 X("opt-sens").value = It.sens ?? 1;
 X("opt-vol").value = It.vol ?? 0.8;
 X("opt-dynres").checked = !!It.dynres;
+const look = new LookPanel(E, () => ue, J);
 function Za() {
   ((It.quality = X("opt-quality").value),
     (It.fisheye = +X("opt-fisheye").value),
@@ -244,8 +247,8 @@ function Za() {
     (It.dynres = X("opt-dynres").checked),
     wh(),
     (E.post.params.fisheye = It.fisheye),
-    (E.post.params.exposureBias = 0.8),
-    (E.post.params.blackCrush = 0.9),
+    (E.post.params.exposureBias = 0.66),
+    (E.post.params.blackCrush = look?.saved?.blackCrush ?? 1.05),
     _t && (_t.sens = It.sens),
     Be.setVolume(It.vol),
     (E.dynres.enabled = It.dynres),
@@ -287,7 +290,6 @@ Dt.onLock = (a) => {
 function bh() {
   Dt.lock();
 }
-const look = new LookPanel(E, () => ue, J);
 Dt.on("F3", () => (J.toggle(), look.toggle(J.visible)));
 Dt.on("KeyB", () => {
   er &&
@@ -385,7 +387,7 @@ function Qa(a) {
         : 0.08 + 0.92 * qs(ue.collider.bvh, E.camera.position, 24)));
     const s = ue.zoneAt(_t.pos);
     (Be.setEnvironment(s ? s.type : "outdoor"),
-      (E.post.params.exposureBias = s && /oscuro/.test(s.name) ? 0.5 : s && /quemado/.test(s.name) ? 0.34 : 0.8));
+      (E.post.params.exposureBias = !s ? 0.66 : /oscuro/.test(s.name) ? 0.34 : /quemado/.test(s.name) ? 0.34 : s.type === "indoor" ? 0.8 : s.type === "semi" ? 0.85 : 0.66));
   }
   (le.update(e, _t, Vo[0], Vo[1], wo ? 1 : Ca),
     updateGunFx(gfx, le, E.camera),

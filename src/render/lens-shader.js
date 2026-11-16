@@ -35,7 +35,7 @@ export const finalFrag = (common) => /* glsl */ `
   uniform float satAmt;        // saturación global
   uniform float accent;        // cuánto conservan su color los rojos/cálidos (luz de emergencia, óxido)
   uniform float sensorGain;    // pendiente del sensor: >1 quema antes las altas luces
-  uniform float sharpen;
+  uniform float sharpen; uniform float contrast;
   uniform sampler2D tVol; uniform vec3 hazeColor;
   varying vec2 vUv;
   ${common}
@@ -177,7 +177,7 @@ export const finalFrag = (common) => /* glsl */ `
     sat = mix(sat, min(1.05, sat + 0.38), warm * accent);
     col = mix(vec3(l), col, sat);
     col *= mix(vec3(0.96, 0.995, 1.04), vec3(1.0), smoothstep(0.0, 0.45, l));
-    col = mix(col, col * col * (3.0 - 2.0 * col), 0.30);       // leve S en medios
+    col = mix(col, col * col * (3.0 - 2.0 * col), clamp(0.55 * contrast, 0.0, 1.0));       // leve S en medios
     // negros profundos: punto de negro bajado + pie de curva más hondo; las altas no se tocan
     {
       float bp = 0.022 * blackCrush;

@@ -49,6 +49,12 @@ godrays, wetness, grime, emergency.
 - Follaje: alpha afilado con fwidth → adiós al tramado de puntos.
 - Balizas: menos alcance e intensidad; eliminada la del extremo este de la galería.
 
+### Calibración contra las referencias (`tools/stats.py`)
+- Se miden percentiles de luma, % de negros y saturación de las referencias y de las capturas.
+- Exposición por tipo de zona, tope de ganancia de auto-exposición 3.4 (antes 8: los interiores subían a gris),
+  niebla con el color de la luz ambiente local y 45 % menos densa, curva S más fuerte (`contrast`), saturación 1.25.
+- Pasada automática de grafitis (`src/world/autograffiti.js`): 45 (media) / 80 (alta) pintadas extra por raycast.
+
 ### Pendiente
 - NPC/operadores (sin modelo CC0 con esqueleto), sombras de contacto en brazos.
 - Fase 5: audio. Rebake de GI (el horneador no está en el repo). Medición real de fps en Mac.

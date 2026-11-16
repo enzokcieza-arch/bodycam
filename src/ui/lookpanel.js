@@ -18,6 +18,7 @@ export const LOOK_CONTROLS = [
   ["SENSOR"],
   ["exposureComp", "compensación de exposición", 0.3, 2.5, 0.01, "post"],
   ["sensorGain", "quemado de altas luces", 0.5, 2, 0.01, "post"],
+  ["contrast", "contraste (curva S)", 0, 1.8, 0.05, "post"],
   ["blackCrush", "negros aplastados", 0, 1.5, 0.01, "post"],
   ["saturation", "saturación", 0, 1.6, 0.01, "post"],
   ["accent", "acento rojo/cálido", 0, 2, 0.05, "post"],

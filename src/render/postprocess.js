@@ -199,7 +199,7 @@ class Er {
           lod: { value: 6 },
           snap: { value: 1 },
           key: { value: 0.21 },
-          expRange: { value: new Rt(0.25, 8) },
+          expRange: { value: new Rt(0.25, 3.4) },
         },
       )),
       (this.brightMat = ts(
@@ -312,6 +312,7 @@ class Er {
           accent: { value: 1 },
           sensorGain: { value: 1 },
           sharpen: { value: 1 },
+          contrast: { value: 1 },
           ...e(),
         },
         { USE_AO: 0, MB_N: 6, MB_DEPTH: 0, LENS_DIRT: 0, COMPRESSION: 0, VOLUMETRIC: 0 },
@@ -609,6 +610,7 @@ class Er {
       (b.accent.value = i.accent),
       (b.sensorGain.value = i.sensorGain),
       (b.sharpen.value = i.sharpen),
+      (b.contrast.value = i.contrast),
       this.pass(this.finalMat, null));
   }
 }
@@ -625,10 +627,11 @@ const LOOK_DEFAULTS = {
   compression: 0.6,
   rollingShutter: 1,
   chromaGrain: 0.8,
-  saturation: 1,
+  saturation: 1.25,
   accent: 1,
   sensorGain: 1,
   sharpen: 1,
+  contrast: 1,
   exposureComp: 1,
   motionBlurAmt: 1,
 };
@@ -684,6 +687,7 @@ const Wr = new B(),
       godrays: !0,
       volSteps: 8,
       dust: 450,
+      autoGraffiti: 45,
       torchShadow: !1,
     },
     high: {
@@ -709,6 +713,7 @@ const Wr = new B(),
       godrays: !0,
       volSteps: 14,
       dust: 1100,
+      autoGraffiti: 80,
       torchShadow: !0,
     },
   };

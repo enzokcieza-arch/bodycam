@@ -145,7 +145,13 @@ export class Atmosphere {
     this.fixtures.instanceColor.needsUpdate = true;
 
     // neblina global (FogExp2 de Three) escalada por "haze"
-    if (engine.scene.fog) engine.scene.fog.density = this.fogBase * (0.55 + 0.45 * params.haze);
+    // la niebla de Three añade su color aunque no haya luz: en interiores oscuros levantaba los negros a gris.
+    // Ahora su color sigue a la luz ambiente del punto donde está la cámara y la densidad base baja un 45 %.
+    if (engine.scene.fog) {
+      this.fogColor0 || (this.fogColor0 = engine.scene.fog.color.clone());
+      engine.scene.fog.density = this.fogBase * (0.30 + 0.25 * params.haze);
+      engine.scene.fog.color.copy(this.fogColor0).multiplyScalar(0.10 + 0.90 * ambient);
+    }
 
     // datos para el pase volumétrico
     const atmo = engine.post.atmo;
@@ -156,7 +162,7 @@ export class Atmosphere {
     atmo.godrays = params.godrays;
     atmo.ambient = ambient;
     const fog = engine.scene.fog;
-    if (fog) atmo.hazeColor.copy(fog.color).multiplyScalar(0.35 + 0.65 * ambient);
+    if (fog) atmo.hazeColor.copy(fog.color);
     if (engine.sun) atmo.sunDir.copy(engine.sun.position).sub(engine.sun.target.position).normalize();
     atmo.torch = vm && vm.torch && vm.torch.intensity > 0.5 ? vm.torch : null;
 
