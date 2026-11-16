@@ -447,7 +447,7 @@ class dh {
       e.start(),
       (this.ambGain = s));
     const r = () => {
-      if (this.env === "outdoor" && Math.random() < 0.15) {
+      if (!this.noBirds && this.env === "outdoor" && Math.random() < 0.15) {
         const l = t.currentTime;
         for (let u = 0; u < 3 + Math.random() * 4; u++) {
           const h = t.createOscillator(),

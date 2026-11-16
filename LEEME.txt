@@ -5,6 +5,8 @@ NOVEDADES v3.0 (look "bodycam fotorrealista", NOCHE DE TERROR)
   · Siempre es de noche: cielo nocturno nublado, luna fría, interiores a oscuras, linterna encendida al empezar
     (F la apaga). Balizas rojas giratorias, carteles rojos de SALIDA que fallan, bengalas rojas en el suelo,
     fluorescentes que parpadean o están fundidos. La cámara sube la ganancia: más grano, como una bodycam real.
+  · Sonido 3D de terror: zumbido de luces, siseo de bengalas, viento, grillos, goteo, y sustos lejanos
+    (portazos, golpes, pasos, radio). Usa auriculares.
   · Lente y sensor: aberración cromática, viñeta, halación, suciedad de lente, ruido de croma, compresión de
     vídeo, rolling shutter y motion blur con profundidad.
   · Luz y atmósfera: neblina y conos de luz volumétricos, balizas rojas de emergencia, polvo en suspensión,

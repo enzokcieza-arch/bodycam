@@ -4,6 +4,7 @@ import { Gr } from "./core/engine.js";
 import { LookPanel } from "./ui/lookpanel.js";
 import { Atmosphere } from "./world/atmosphere.js";
 import { NightLights } from "./world/nightlights.js";
+import { NightSound } from "./audio/nightsound.js";
 import { autoGraffiti } from "./world/autograffiti.js";
 import { forestFloor } from "./world/dressing.js";
 import { markReflective } from "./render/ssr.js";
@@ -169,6 +170,7 @@ async function xh() {
       await ue.build((t) => us(null, t)),
       (ue.atmosphere = new Atmosphere(E, ue)),
       (night = new NightLights(E, ue, E.quality.night || {})),
+      (nsnd = new NightSound(Be, ue, night, E.camera)),
       autoGraffiti(ue, E.quality.autoGraffiti || 0),
       us(null, "Sotobosque (Poly Haven, CC0)…"),
       await forestFloor(ue, Ge, { density: E.quality.forest ?? 1 }));
@@ -403,6 +405,7 @@ function Qa(a) {
     ue.updateLights(E.camera.position, e),
     ue.atmosphere.update(e, E.camera, le, Ca),
     night?.update(e),
+    nsnd?.update(e),
     WG_UNIFORMS.wgParams.value.set(ue.atmosphere.params.wetness, ue.atmosphere.params.grime, 0),
     ue.trees?.update?.(E.camera, e),
     (Oa -= e),
@@ -424,6 +427,7 @@ function Qa(a) {
         : 0.08 + 0.92 * qs(ue.collider.bvh, E.camera.position, 24)));
     const s = ue.zoneAt(_t.pos);
     (Be.setEnvironment(s ? s.type : "outdoor"),
+      nsnd?.setZone(s),
       (E.post.params.exposureBias = s && /bosque/.test(s.name) ? 0.85 : 1));
   }
   (le.update(e, _t, Vo[0], Vo[1], wo ? 1 : Ca),
@@ -462,7 +466,8 @@ function Qa(a) {
   }
 }
 let gfx = null,
-  night = null;
+  night = null,
+  nsnd = null;
 let breathV = 0,
   adsPrev = 0;
 let Si = 0,
@@ -500,6 +505,9 @@ window.__game = {
   input: Dt,
   get night() {
     return night;
+  },
+  get nightSound() {
+    return nsnd;
   },
   get gfx() {
     return gfx;

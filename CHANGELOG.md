@@ -87,6 +87,21 @@ godrays, wetness, grime, emergency.
 - Linterna encendida al empezar, intensidad recalibrada, cookie más suave, dispersión en niebla sin patrón.
 - Se retira el experimento de cielo soleado por zonas.
 
+### Sonido de terror nocturno (`src/audio/nightsound.js`)
+- Fuentes 3D (HRTF) en las luces cercanas: zumbido de fluorescentes con chasquido de arco al parpadear, relé y
+  zumbido de balizas, neón de SALIDA, siseo de bengalas. Pool de 4 voces reasignado a las fuentes más próximas.
+- Ambiente por zona: viento con ráfagas y silbidos (atenuado dentro), grillos en exteriores, búho en el bosque,
+  goteo con eco en interiores. Se quitan los pájaros diurnos de v2.5.
+- Sustos raros (25–70 s, sin repetir): portazo, tres golpes en la pared, pasos corriendo en otra planta,
+  radio policial distorsionada, gemido estructural del edificio.
+- `tools/audiotest.mjs`: mide el nivel real de salida por zona y por susto.
+
+### Arreglos
+- Cámara al saltar: vibraba ±6 cm a ~15 Hz al aterrizar (muelle integrado por frame); ahora un hundimiento suave
+  de ~5 cm igual a 60/75/144 fps (`tools/jumptest.mjs`).
+- Humo de balas y granada: se ilumina por la escena (antes brillaba solo en la oscuridad), sin cuadrados en los
+  sprites; explosión de noche sin pantalla en blanco (luz 600→140, flash de cámara a la mitad).
+
 ### Pendiente
 - NPC/operadores y brazos/arma de alta calidad: los candidatos CC-BY están en Sketchfab (requiere token válido).
 - Sombras de contacto en brazos.
