@@ -1,5 +1,17 @@
-BODYCAM TACTICAL — URBEX (paquete para Mac)
+BODYCAM TACTICAL — URBEX v3.0 (paquete para Mac)
 ==========================================
+
+NOVEDADES v3.0 (look "bodycam fotorrealista")
+  · Lente y sensor: aberración cromática, viñeta, halación, suciedad de lente, ruido de croma, compresión de
+    vídeo, rolling shutter y motion blur con profundidad.
+  · Luz y atmósfera: neblina y conos de luz volumétricos, balizas rojas de emergencia, polvo en suspensión,
+    linterna con cookie.
+  · Suelo: reflejos en charcos y suelos mojados, ceniza en el bosque quemado, humedad y mugre en muros.
+  · Escenario: 38 modelos CC0 nuevos de Poly Haven (desorden en interiores, sotobosque), más grafitis.
+  · Arma: mira de punto rojo (?noreddot la quita), desgaste en metal y tela.
+  Todo se puede afinar en vivo: pulsa F3 → panel LOOK (derecha). Pulsa Esc para soltar el ratón y mover los
+  sliders; se guardan solos. "medir coste GPU de efectos" dice cuántos ms cuesta cada efecto (Chrome).
+  Si va lento: menú → Calidad Baja (apaga volumétrica, reflejos, polvo y desorden extra).
 
 JUGAR
   1. Descomprime el ZIP.
