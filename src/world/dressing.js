@@ -9,6 +9,17 @@
 // Determinista (semillas fijas) para que las capturas sean comparables entre builds.
 import { Vector3, Matrix4, Quaternion, Euler, Box3, InstancedMesh } from "../three.js";
 
+const CELL = 16;
+const FOREST_CELLS = [];
+// Descarte por distancia (además del frustum): de noche, más allá de ~40 m el sotobosque no se distingue.
+// Llamar cada frame; barato (≈ cientos de comprobaciones).
+export function updateDressingVisibility(camera, { forestDist = 40, smallDist = 22, bigDist = 55 } = {}) {
+  const x = camera.position.x, z = camera.position.z;
+  const f2 = (forestDist + CELL * 0.71) ** 2;
+  for (const im of FOREST_CELLS) { const c = im.userData.cell; im.visible = (c[0] - x) ** 2 + (c[1] - z) ** 2 < f2; }
+  for (const o of DRESS_PROPS) { const d = o.userData.small ? smallDist : bigDist; o.visible = (o.position.x - x) ** 2 + (o.position.z - z) ** 2 < d * d; }
+}
+export const DRESS_PROPS = [];
 const rng = (seed) => { let s = seed; return () => (s = (s * 16807) % 2147483647) / 2147483647; };
 const pick = (r, list) => { let t = r() * list.reduce((a, b) => a + b[1], 0); for (const e of list) if ((t -= e[1]) <= 0) return e; return list[0]; };
 
@@ -143,15 +154,28 @@ export async function forestFloor(world, assets, { density = 1, seed = 777 } = {
         if (!charred.has(mat)) { const c = mat.clone(); c.color.multiplyScalar(0.22).lerp({ r: 0.03, g: 0.028, b: 0.026, isColor: true }, 0.4); c.roughness = Math.min(1, (c.roughness ?? 1) * 1.15); charred.set(mat, c); }
         mat = charred.get(mat);
       }
-      const im = new InstancedMesh(o.geometry, mat, mats.length);
-      mats.forEach((M, i) => im.setMatrixAt(i, m.multiplyMatrices(M, local)));
-      im.instanceMatrix.needsUpdate = true;
-      im.castShadow = !/fern|nettle|shrub/.test(model);
-      im.receiveShadow = true;
-      im.computeBoundingSphere();
-      im.userData.surface = /stone|rock/.test(model) ? "concrete" : "soft";
-      im.name = "forest:" + key;
-      world.scene.add(im);
+      // v3.0 rendimiento: un InstancedMesh por celda de CELL m (antes uno por modelo para todo el bosque: su
+      // esfera envolvente lo cubría todo y se dibujaban 4.4 M triángulos aunque el jugador estuviera en el patio).
+      const cells = new Map();
+      for (const M of mats) {
+        const k = Math.floor(M.elements[12] / CELL) + "," + Math.floor(M.elements[14] / CELL);
+        if (!cells.has(k)) cells.set(k, []);
+        cells.get(k).push(M);
+      }
+      for (const [k, list] of cells) {
+        const im = new InstancedMesh(o.geometry, mat, list.length);
+        list.forEach((M, i) => im.setMatrixAt(i, m.multiplyMatrices(M, local)));
+        im.instanceMatrix.needsUpdate = true;
+        im.castShadow = !/fern|nettle|shrub/.test(model);
+        im.receiveShadow = true;
+        im.computeBoundingSphere();
+        im.userData.surface = /stone|rock/.test(model) ? "concrete" : "soft";
+        im.name = "forest:" + key;
+        const [cx, cz] = k.split(",").map((v) => (+v + 0.5) * CELL);
+        im.userData.cell = [cx, cz];
+        world.scene.add(im);
+        FOREST_CELLS.push(im);
+      }
     });
     count += mats.length;
   }

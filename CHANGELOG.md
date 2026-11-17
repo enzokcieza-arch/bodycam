@@ -102,6 +102,17 @@ godrays, wetness, grime, emergency.
 - Humo de balas y granada: se ilumina por la escena (antes brillaba solo en la oscuridad), sin cuadrados en los
   sprites; explosión de noche sin pantalla en blanco (luz 600→140, flash de cámara a la mitad).
 
+### Rendimiento (`tools/perfprobe.mjs`)
+- Sotobosque troceado en celdas de 16 m con descarte por frustum y por distancia (antes cada modelo era un único
+  InstancedMesh que cubría todo el bosque y se dibujaba entero desde cualquier sitio).
+- Plano lejano de cámara 400 → 150 m (la niebla nocturna ya oculta todo a esa distancia).
+- Luces puntuales activas: baja 2, media 4, alta 6 (antes 3/6/8): cada luz se evalúa en todos los píxeles.
+- Desorden pequeño oculto a más de 14/22/32 m y grande a 40/55/80 m (baja/media/alta).
+- Sombras por luz: con la linterna con sombras (calidad alta) ya no se re-renderiza cada frame el mapa de la
+  luna (4096², ~1250 objetos); la luna solo se actualiza bajo demanda.
+- Triángulos por vista en calidad media: patio 7.63 M → 2.96 M, bosque quemado 4.85 M → 2.14 M,
+  bosque oscuro 4.34 M → 1.79 M; pasillo y callejón sin cambios (0.54 M / 0.34 M).
+
 ### Pendiente
 - NPC/operadores y brazos/arma de alta calidad: los candidatos CC-BY están en Sketchfab (requiere token válido).
 - Sombras de contacto en brazos.

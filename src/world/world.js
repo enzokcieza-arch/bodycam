@@ -4,7 +4,7 @@ import { dn } from "../level/builder.js";
 import { $i, Ba, Le, kl } from "../level/area-urbex.js";
 import { Bl, Fl, Ll, Rl, Vl, qs } from "./geometry-utils.js";
 import { Jl, Ql } from "./trees.js";
-import { urbanClutter } from "./dressing.js";
+import { urbanClutter, DRESS_PROPS } from "./dressing.js";
 import { ac, cc, ji } from "./ground-scatter.js";
 import { Cc, Fc, Oc, Rc, Vc, Xn, Zn, da } from "./graffiti.js";
 
@@ -108,7 +108,8 @@ class Bc {
       const g = c.get(f.model);
       if (!g) continue;
       const m = this.instantiate(g.scene, f);
-      ((m.userData.surface = Vc[f.model] || "wood"),
+      (f.dress && ((m.userData.small = f.collide === !1), DRESS_PROPS.push(m)),
+      (m.userData.surface = Vc[f.model] || "wood"),
         (m.userData.model = f.model),
         this.scene.add(m),
         m.updateMatrixWorld(!0));

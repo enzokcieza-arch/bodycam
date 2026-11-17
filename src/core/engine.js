@@ -15,7 +15,9 @@ class Gr {
       (this.renderer.outputColorSpace = Te),
       (this.renderer.toneMapping = hr),
       (this.renderer.shadowMap.enabled = !0),
-      (this.renderer.shadowMap.autoUpdate = !1),
+      // v3.0: sombras por luz (shadow.autoUpdate): antes, con la linterna con sombras, se re-renderizaba cada frame
+      // también el mapa de la luna (4096², ~1250 objetos). Ahora la luna solo se actualiza bajo demanda.
+      (this.renderer.shadowMap.autoUpdate = !0),
       (this.renderer.info.autoReset = !1),
       (this.backend = "WebGL2"),
       (this.scene = new Ti()),

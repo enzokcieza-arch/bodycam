@@ -6,7 +6,7 @@ import { Atmosphere } from "./world/atmosphere.js";
 import { NightLights } from "./world/nightlights.js";
 import { NightSound } from "./audio/nightsound.js";
 import { autoGraffiti } from "./world/autograffiti.js";
-import { forestFloor } from "./world/dressing.js";
+import { forestFloor, updateDressingVisibility } from "./world/dressing.js";
 import { markReflective } from "./render/ssr.js";
 import { enhanceViewmodel, updateGunFx } from "./weapon/gunfx.js";
 import { Nr } from "./core/input.js";
@@ -109,6 +109,7 @@ const NIGHT = {
   fogDensity: 0.03,
   key: 0.075,         // luminancia objetivo de la auto-exposición (día: 0.21) → la noche se ve oscura
   maxExp: 9,          // ganancia máxima del sensor (día: 3.4); más ganancia = más grano y ruido de croma
+  far: 150,           // plano lejano (día: 400): con la niebla nocturna a 150 m la transmitancia ya es < 0.3 %
 };
 async function yh() {
   us(0.05, "Cielo nocturno (Poly Haven, CC0)…");
@@ -154,6 +155,7 @@ async function yh() {
     (E.scene.fog = new Ir(NIGHT.fog, NIGHT.fogDensity)),
     // exposición nocturna de bodycam
     E.post.setNight?.(NIGHT),
+    ((E.camera.far = NIGHT.far), E.camera.updateProjectionMatrix()),
     console.info("[env] noche · escala cielo", NIGHT.skyScale.toExponential(2), "· luna", m.toArray().map((b) => b.toFixed(2))));
 }
 async function xh() {
@@ -432,7 +434,6 @@ function Qa(a) {
   }
   (le.update(e, _t, Vo[0], Vo[1], wo ? 1 : Ca),
     updateGunFx(gfx, le, E.camera),
-    E.quality.torchShadow && le.torch.intensity > 0.5 && (E.renderer.shadowMap.needsUpdate = !0),
     J.end(),
     J.begin("partículas"),
     xt.update(e, E.camera.position, Ca),
@@ -450,6 +451,7 @@ function Qa(a) {
     E.camera.updateProjectionMatrix(),
     (X("flash").style.opacity = Math.min(0.85, o.flash * 0.6).toFixed(3)),
     ue.scatter?.update(E.camera),
+    updateDressingVisibility(E.camera, E.quality.dressDist),
     J.begin("render submit"),
     J.beginGPU(),
     E.post.render(E.scene, E.camera, e),

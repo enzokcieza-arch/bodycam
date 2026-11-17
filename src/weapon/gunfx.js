@@ -183,6 +183,7 @@ export function enhanceViewmodel(vm, engine, opts = {}) {
     vm.torch.color.setHex(0xfff2dc);
     if (engine.quality.torchShadow) {
       vm.torch.castShadow = true;
+      vm.torch.shadow.autoUpdate = true;     // la linterna se mueve con el arma: cada frame (la luna no)
       vm.torch.shadow.mapSize.set(1024, 1024);
       vm.torch.shadow.camera.near = 0.35;
       vm.torch.shadow.camera.far = 30;

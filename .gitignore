@@ -6,3 +6,4 @@ shots/after[0-9]*/
 dist/
 shots/night[0-9]*/
 shots/fx-*/
+shots/perf[0-9]*/
