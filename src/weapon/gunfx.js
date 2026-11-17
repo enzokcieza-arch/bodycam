@@ -1,15 +1,18 @@
 // weapon/gunfx.js — Fase 4 (v3.0): materiales creíbles para arma/guantes, mira red-dot colimada y linterna con cookie.
 // Todo procedural (sin assets nuevos). Se aplica sobre el viewmodel ya cargado (weapon/viewmodel.js).
 import {
-  Vector3, Vector4, Group, Mesh, CylinderGeometry, BoxGeometry, CircleGeometry, MeshStandardMaterial, ShaderMaterial,
+  Vector3, Vector4, Vector2, Group, Mesh, LatheGeometry, CylinderGeometry, BoxGeometry, CircleGeometry, MeshStandardMaterial, ShaderMaterial,
   CanvasTexture, AdditiveBlending, DoubleSide, SRGBColorSpace, LinearFilter,
 } from "../three.js";
 
 // ── desgaste procedural en espacio de objeto (posición de bind → estable aunque el arma se anime)
 const WEAR_VERT_PARS = /* glsl */ `varying vec3 vObjPos;\n`;
+// luz de rebote sobre el arma y los brazos: la linterna ilumina lo que tiene delante y eso devuelve algo de luz
+// (sin esto, de noche el arma era una silueta negra). Lo actualiza updateGunFx cada frame.
+export const VM_BOUNCE = { value: 0 };
 const WEAR_FRAG_PARS = /* glsl */ `
   varying vec3 vObjPos;
-  uniform float wearScale; uniform vec4 wearAmt;   // x = arañazos, y = grasa/manchas, z = borde gastado, w = tejido
+  uniform float wearScale; uniform vec4 wearAmt; uniform float vmBounce;   // x = arañazos, y = grasa/manchas, z = borde gastado, w = tejido
   float wh(vec3 p){ p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
   float wn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
     return mix(mix(mix(wh(i), wh(i + vec3(1,0,0)), f.x), mix(wh(i + vec3(0,1,0)), wh(i + vec3(1,1,0)), f.x), f.y),
@@ -20,12 +23,14 @@ const WEAR_FRAG_PARS = /* glsl */ `
 function addWear(mat, { scale = 60, scratches = 0, grease = 0, edge = 0, weave = 0 } = {}) {
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.wearScale = { value: scale };
+    sh.uniforms.vmBounce = VM_BOUNCE;
     sh.uniforms.wearAmt = { value: new Vector4(scratches, grease, edge, weave) };
     sh.vertexShader = sh.vertexShader
       .replace("#include <common>", "#include <common>\n" + WEAR_VERT_PARS)
       .replace("#include <begin_vertex>", "#include <begin_vertex>\n  vObjPos = position;");
     sh.fragmentShader = sh.fragmentShader
       .replace("#include <common>", "#include <common>\n" + WEAR_FRAG_PARS)
+      .replace("#include <emissivemap_fragment>", "#include <emissivemap_fragment>\n  totalEmissiveRadiance += diffuseColor.rgb * vmBounce * (0.55 + 0.45 * max(0.0, -normalize(vNormal).z));")
       .replace("#include <normal_fragment_maps>", /* glsl */ `#include <normal_fragment_maps>
         // pliegues de tela / costuras (solo materiales con trama): bump procedural por derivadas de pantalla
         if (wearAmt.w > 0.0) {
@@ -59,7 +64,7 @@ function addWear(mat, { scale = 60, scratches = 0, grease = 0, edge = 0, weave =
           }
         }`);
   };
-  mat.customProgramCacheKey = () => `wear2|${scratches}|${grease}|${edge}|${weave}|${scale}`;
+  mat.customProgramCacheKey = () => `wear3|${scratches}|${grease}|${edge}|${weave}|${scale}`;
   mat.needsUpdate = true;
 }
 
@@ -70,19 +75,22 @@ function makeTorchCookie() {
   const g = c.getContext("2d");
   g.fillStyle = "#000"; g.fillRect(0, 0, 256, 256);
   const gr = g.createRadialGradient(128, 128, 0, 128, 128, 126);
+  // v3.0b: punto central ~1/4 del cono + derrame amplio y visible (antes casi negro: la sala quedaba a oscuras
+  // salvo un círculo en la pared). Proporciones típicas de una linterna táctica: hotspot 8–10°, derrame 55–60°.
   gr.addColorStop(0.0, "rgb(255,255,255)");
-  gr.addColorStop(0.16, "rgb(255,252,244)");
-  gr.addColorStop(0.24, "rgb(150,146,138)");
-  gr.addColorStop(0.40, "rgb(98,96,92)");
-  gr.addColorStop(0.50, "rgb(102,100,96)");      // anillo del reflector (suave)
-  gr.addColorStop(0.58, "rgb(40,39,38)");
-  gr.addColorStop(0.92, "rgb(14,14,15)");        // derrame (spill)
+  gr.addColorStop(0.10, "rgb(255,252,246)");
+  gr.addColorStop(0.20, "rgb(200,196,188)");
+  gr.addColorStop(0.30, "rgb(120,118,112)");
+  gr.addColorStop(0.36, "rgb(92,90,86)");       // anillo del reflector (borde del hotspot)
+  gr.addColorStop(0.44, "rgb(62,61,58)");
+  gr.addColorStop(0.75, "rgb(46,45,44)");       // meseta del derrame
+  gr.addColorStop(0.93, "rgb(30,30,29)");
   gr.addColorStop(1.0, "rgb(0,0,0)");
   g.fillStyle = gr; g.fillRect(0, 0, 256, 256);
   // imperfecciones: sombra del LED y anillos finos
   g.globalCompositeOperation = "multiply";
-  for (let i = 0; i < 5; i++) {
-    g.strokeStyle = `rgba(${215 + i * 8},${215 + i * 8},${215 + i * 8},1)`;
+  for (let i = 0; i < 2; i++) {
+    g.strokeStyle = `rgba(${236 + i * 6},${236 + i * 6},${236 + i * 6},1)`;
     g.lineWidth = 1.5; g.beginPath(); g.arc(128 + (i % 2 ? 2 : -2), 128, 30 + i * 17, 0, 6.2832); g.stroke();
   }
   g.fillStyle = "rgba(170,170,170,1)"; g.fillRect(124, 122, 8, 12);
@@ -98,18 +106,32 @@ function makeRedDot() {
   const grp = new Group();
   const body = new MeshStandardMaterial({ color: 0x151617, roughness: 0.46, metalness: 0.75 });
   addWear(body, { scale: 90, scratches: 0.8, grease: 0.7, edge: 0.5 });
+  body.side = DoubleSide;   // el perfil torneado se ve por dentro y por fuera
+  // v3.0b: silueta tipo micro red-dot real (antes: tubo sin grosor + 4 salientes simétricos = una "cruz" en
+  // el centro de la pantalla). Tubo torneado con pared y parasol, torreta superior adelantada, torreta+batería a la
+  // derecha más baja, montaje bajo y ancho. Nada a la izquierda.
   const R = 0.0175, L = 0.062;
-  const tube = new Mesh(new CylinderGeometry(R, R, L, 28, 1, true), body);
-  tube.rotation.x = Math.PI / 2; tube.material.side = DoubleSide;
-  const ringF = new Mesh(new CylinderGeometry(R + 0.003, R + 0.003, 0.012, 28, 1, true), body);
-  ringF.rotation.x = Math.PI / 2; ringF.position.z = -L / 2 + 0.006;
-  const ringB = ringF.clone(); ringB.position.z = L / 2 - 0.006;
-  const mount = new Mesh(new BoxGeometry(0.026, 0.016, 0.046), body); mount.position.y = -R - 0.007;
-  const rail = new Mesh(new BoxGeometry(0.021, 0.008, 0.085), body); rail.position.y = -R - 0.019;
-  const knobT = new Mesh(new CylinderGeometry(0.0075, 0.0075, 0.011, 14), body); knobT.position.set(0, R + 0.005, 0.004);
-  const knobR = new Mesh(new CylinderGeometry(0.0075, 0.0075, 0.011, 14), body); knobR.rotation.z = Math.PI / 2; knobR.position.set(R + 0.005, 0, 0.004);
-  const batt = new Mesh(new CylinderGeometry(0.0085, 0.0085, 0.02, 14), body); batt.rotation.z = Math.PI / 2; batt.position.set(-R - 0.008, -0.004, -0.008);
-  grp.add(tube, ringF, ringB, mount, rail, knobT, knobR, batt);
+  const prof = [
+    [R - 0.0028, L / 2], [R + 0.0012, L / 2], [R + 0.0012, L / 2 - 0.006], [R, L / 2 - 0.008],            // aro trasero
+    [R, -L / 2 + 0.014], [R + 0.0006, -L / 2 + 0.01], [R + 0.0016, -L / 2], [R - 0.0004, -L / 2],         // parasol delantero
+    [R - 0.0028, -L / 2 + 0.004], [R - 0.0028, L / 2],
+  ].map(([r, z]) => new Vector2(r, z));
+  const tube = new Mesh(new LatheGeometry(prof, 40), body);
+  tube.rotation.x = Math.PI / 2;
+  const turret = (r, h, x, y, z, rotZ) => {
+    const g = new Group();
+    const c = new Mesh(new CylinderGeometry(r, r * 1.08, h, 20), body);
+    const cap = new Mesh(new CylinderGeometry(r * 0.82, r, h * 0.35, 20), body);
+    cap.position.y = h * 0.65;
+    g.add(c, cap);
+    g.position.set(x, y, z); g.rotation.z = rotZ;
+    return g;
+  };
+  const top = turret(0.0062, 0.007, 0, R + 0.0035, -0.006, 0);
+  const side = turret(0.0068, 0.009, R + 0.0042, -0.003, -0.004, -Math.PI / 2);
+  const mount = new Mesh(new BoxGeometry(0.03, 0.011, 0.038), body); mount.position.set(0, -R - 0.0045, 0.002);
+  const base = new Mesh(new BoxGeometry(0.024, 0.006, 0.052), body); base.position.set(0, -R - 0.012, 0.002);
+  grp.add(tube, top, side, mount, base);
 
   const lensMat = new ShaderMaterial({
     transparent: true, depthWrite: false, side: DoubleSide,
@@ -178,8 +200,8 @@ export function enhanceViewmodel(vm, engine, opts = {}) {
   // 2) linterna: cookie + cono algo más abierto (núcleo + derrame en una sola luz)
   if (vm.torch) {
     vm.torch.map = makeTorchCookie();
-    vm.torch.angle = 0.60;
-    vm.torch.penumbra = 0.25;
+    vm.torch.angle = 0.85;
+    vm.torch.penumbra = 0.15;
     vm.torch.color.setHex(0xfff2dc);
     if (engine.quality.torchShadow) {
       vm.torch.castShadow = true;
@@ -223,6 +245,7 @@ export function enhanceViewmodel(vm, engine, opts = {}) {
 // por frame: eje del arma en espacio de vista para el punto colimado
 const _a = new Vector3(), _b = new Vector3();
 export function updateGunFx(fx, vm, camera) {
+  VM_BOUNCE.value += ((vm.torch && vm.torch.intensity > 0.5 ? 0.012 : 0.0015) - VM_BOUNCE.value) * 0.2;
   if (!fx?.redDot) return;
   vm.gunOff.getWorldPosition(_a);
   _b.set(0, 0, -1).transformDirection(vm.gunOff.matrixWorld);

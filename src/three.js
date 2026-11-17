@@ -6,7 +6,7 @@ export {
   m as Box3, b as MathUtils,
   c as Scene, G as Group, g as Mesh, ak as InstancedMesh, aB as Points,
   E as BufferGeometry, I as BufferAttribute, al as InstancedBufferAttribute,
-  B as BoxGeometry, p as PlaneGeometry, Y as CylinderGeometry, _ as SphereGeometry, a2 as CircleGeometry, ax as TorusGeometry,
+  B as BoxGeometry, p as PlaneGeometry, Y as CylinderGeometry, _ as SphereGeometry, a2 as CircleGeometry, an as LatheGeometry, ax as TorusGeometry,
   d as MeshStandardMaterial, h as MeshBasicMaterial, u as ShaderMaterial, aG as Material,
   f as PointLight, aw as SpotLight, aI as DirectionalLight,
   k as PerspectiveCamera, O as OrthographicCamera,

@@ -887,7 +887,7 @@ class Nc {
         this.flashT <= 0 &&
           ((this.flash.visible = !1), (this.flashLight.intensity = 0))),
       (this.torch.intensity +=
-        ((this.torchOn ? 9 : 0) - this.torch.intensity) * Math.min(1, t * 20)),
+        ((this.torchOn ? 14 : 0) - this.torch.intensity) * Math.min(1, t * 20)),
       (this.envIntensity += (i - this.envIntensity) * Math.min(1, t * 3)));
     for (const G of this.materials) G.envMapIntensity = this.envIntensity;
     (this.reloadT >= 0 &&

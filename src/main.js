@@ -100,11 +100,11 @@ function sunFromHDRI(a) {
 // direccional, neblina oscura. La exposición nocturna y la atenuación de las sondas de GI (horneadas de día) se
 // aplican en NIGHT más abajo.
 const NIGHT = {
-  skyLum: 0.012,      // luminancia media a la que se normaliza el cielo (unidades de escena; el día nublado ≈ 1)
+  skyLum: 0.0065,      // luminancia media a la que se normaliza el cielo (unidades de escena; el día nublado ≈ 1)
   envI: 0.9,          // intensidad del entorno (IBL) relativa a esa normalización
-  moon: 0.16,         // intensidad de la luna (luz direccional con sombras)
+  moon: 0.28,         // intensidad de la luna (luz direccional con sombras)
   moonColor: 0x9db4dc,
-  probes: 0.035,      // GI horneada de día → luz de luna/rebote residual
+  probes: 0.05,       // GI horneada de día → luz de luna/rebote residual
   fog: 0x0b0e13,
   fogDensity: 0.03,
   key: 0.075,         // luminancia objetivo de la auto-exposición (día: 0.21) → la noche se ve oscura

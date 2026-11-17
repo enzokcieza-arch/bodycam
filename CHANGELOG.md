@@ -113,6 +113,16 @@ godrays, wetness, grime, emergency.
 - Triángulos por vista en calidad media: patio 7.63 M → 2.96 M, bosque quemado 4.85 M → 2.14 M,
   bosque oscuro 4.34 M → 1.79 M; pasillo y callejón sin cambios (0.54 M / 0.34 M).
 
+### Auditoría de puntos débiles (v3.3)
+- Filtro temporal (`src/render/temporal.js`) para la volumétrica y los reflejos SSR: reproyección con profundidad
+  + recorte a la vecindad 3×3; elimina el grano del haz de la linterna y de los conos de luz sin estelas.
+- Linterna: punto central + derrame amplio y visible (ángulo 0.60 → 0.85 rad, cookie con meseta de derrame,
+  intensidad 9 → 14, anillos más suaves). Antes solo se veía un círculo en la pared y la sala quedaba en negro.
+- Mira red-dot rediseñada: tubo torneado con pared y parasol, torreta arriba adelantada y torreta+batería a la
+  derecha; nada a la izquierda. Antes, 4 salientes simétricos formaban una "cruz" en el centro de la pantalla.
+- Rebote de la linterna sobre el arma y los brazos (dejan de ser una silueta negra).
+- Noche: luna 0.16 → 0.28, GI residual 3.5 % → 5 %, cielo más oscuro (sin negro absoluto en medio encuadre).
+
 ### Pendiente
 - NPC/operadores y brazos/arma de alta calidad: los candidatos CC-BY están en Sketchfab (requiere token válido).
 - Sombras de contacto en brazos.

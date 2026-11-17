@@ -4,6 +4,7 @@ import { a5 as CanvasTexture, v as Te } from "three-vendor";
 import { finalFrag, makeLensDirtCanvas } from "./lens-shader.js";
 import { volFrag, VOL_MAX_LIGHTS } from "./volumetric.js";
 import { ssrFrag } from "./ssr.js";
+import { temporalFrag } from "./temporal.js";
 import { Vector3, Color } from "../three.js";
 
 const Ur =
@@ -244,6 +245,19 @@ class Er {
         },
       )),
       (this.projWide = new B()),
+      (this.taaMat = ts(
+        temporalFrag(G0),
+        {
+          tCur: { value: null },
+          tHist: { value: null },
+          tDepth: { value: null },
+          reprojFull: { value: this.reprojFull },
+          texel: { value: new Rt() },
+          blend: { value: 0.88 },
+          valid: { value: 0 },
+          ...e(),
+        },
+      )),
       (this.ssrMat = ts(
         ssrFrag(G0),
         {
@@ -381,12 +395,14 @@ class Er {
     this.ssrRT = null;
     if (t.ssr) {
       this.ssrRT = new Qe(4, 4, { type: v0, minFilter: Eo, magFilter: Eo, depthBuffer: !1 });
+      this.ssrHist = [this.ssrRT.clone(), this.ssrRT.clone()];
       this.ssrMat.defines.SSR_STEPS = t.ssrSteps || 24;
       this.ssrMat.needsUpdate = !0;
     }
     this.volRT = null;
     if (t.volumetric) {
       this.volRT = new Qe(4, 4, { type: v0, minFilter: Eo, magFilter: Eo, depthBuffer: !1 });
+      this.volHist = [this.volRT.clone(), this.volRT.clone()];
       const vd = this.volMat.defines;
       vd.VOL_LIGHTS = Math.min(t.pointLights, VOL_MAX_LIGHTS);
       vd.VOL_TORCH = 1;
@@ -428,6 +444,8 @@ class Er {
       this.aoRT2,
       this.volRT,
       this.ssrRT,
+      ...(this.ssrHist || []),
+      ...(this.volHist || []),
       ...(this.adaptRT || []),
       ...(this.down || []),
       ...(this.up || []),
@@ -449,8 +467,8 @@ class Er {
         r = Math.max(1, Math.round(e * i));
       (this.aoRT.setSize(n, r), this.aoRT2.setSize(n, r));
     }
-    this.volRT && this.volRT.setSize(Math.max(1, t >> 1), Math.max(1, e >> 1));
-    this.ssrRT && this.ssrRT.setSize(Math.max(1, t >> 1), Math.max(1, e >> 1));
+    for (const r of [this.volRT, this.ssrRT, ...(this.volHist || []), ...(this.ssrHist || [])]) r && r.setSize(Math.max(1, t >> 1), Math.max(1, e >> 1));
+    this.histValid = 0;
     this.resizeCount = (this.resizeCount || 0) + 1;
   }
   // v3.0: exposición nocturna de bodycam (luminancia objetivo baja y más ganancia máxima → oscuro con grano)
@@ -460,8 +478,24 @@ class Er {
     this.atmo.sunCol.set(0.35, 0.42, 0.6).multiplyScalar(N.moon);
     this.night = N;
   }
+  // acumulación temporal de un buffer ruidoso (ver render/temporal.js); devuelve la textura resuelta
+  temporal(cur, hist, depth, key) {
+    if (!hist || (this.params.temporal ?? 1) <= 0) return cur.texture;
+    this._ti = this._ti || {};
+    const i = (this._ti[key] = 1 - (this._ti[key] || 0));
+    const T = this.taaMat.uniforms;
+    T.tCur.value = cur.texture;
+    T.tHist.value = hist[1 - i].texture;
+    T.tDepth.value = depth;
+    T.texel.value.set(1 / cur.width, 1 / cur.height);
+    T.valid.value = (this.histValid & (key === "vol" ? 1 : 2)) ? 1 : 0;
+    this.histValid |= key === "vol" ? 1 : 2;
+    this.pass(this.taaMat, hist[i]);
+    return hist[i].texture;
+  }
   resetAdaptation() {
     this.snapAdapt = !0;
+    this.histValid = 0;   // teletransporte/cambio brusco: no reutilizar historia temporal
   }
   pass(t, e) {
     ((this.quad.material = t),
@@ -535,7 +569,7 @@ class Er {
       S.time.value = this.time;
       S.strength.value = i.reflections ?? 1;
       this.pass(this.ssrMat, this.ssrRT);
-      b0.tSSR.value = this.ssrRT.texture;
+      b0.tSSR.value = this.temporal(this.ssrRT, this.ssrHist, c, "ssr");
     }
     if (this.volRT && this.atmo.enabled) {
       const A = this.atmo, V = this.volMat.uniforms, vi = e.matrixWorldInverse;
@@ -568,7 +602,7 @@ class Er {
       V.time.value = this.time;
       V.tDepth.value = c;
       this.pass(this.volMat, this.volRT);
-      b0.tVol.value = this.volRT.texture;
+      b0.tVol.value = this.temporal(this.volRT, this.volHist, c, "vol");
       b0.hazeColor.value.copy(A.hazeColor);
     }
     ((this.lumMat.uniforms.tScene.value = h),
