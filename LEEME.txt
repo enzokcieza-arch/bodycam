@@ -21,9 +21,9 @@ NOVEDADES v3.0 (look "bodycam fotorrealista", NOCHE DE TERROR)
 JUGAR
   1. Descomprime el ZIP.
   2. Doble clic en "Jugar Bodycam.command".
-     · La PRIMERA vez macOS dirá que es de un desarrollador no identificado:
-       clic derecho (o Ctrl+clic) sobre el archivo → Abrir → Abrir.
-       (Alternativa en Terminal:  xattr -dr com.apple.quarantine ~/Downloads/BodycamTactical-Mac )
+     · Si macOS lo bloquea (en macOS 15 Sequoia el "clic derecho → Abrir" YA NO FUNCIONA): lee
+       "SI MACOS NO LO ABRE.txt". Resumen: en Terminal escribe  xattr -dr com.apple.quarantine  (con espacio),
+       arrastra esta carpeta a la ventana de Terminal y pulsa Enter. Luego doble clic de nuevo.
   3. Se abre el navegador en http://localhost:8765 . Deja abierta la ventana de Terminal mientras juegas.
   Recomendado: Google Chrome (WebGL2 más rápido y mide el tiempo de GPU). Safari también funciona.
 

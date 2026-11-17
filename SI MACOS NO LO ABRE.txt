@@ -1,0 +1,23 @@
+SI macOS NO DEJA ABRIR "Jugar Bodycam.command"
+===============================================
+
+En macOS 15 (Sequoia) y posteriores, el truco de "clic derecho → Abrir" ya NO funciona con programas que
+no están firmados por un desarrollador de Apple. Hay dos formas de abrirlo:
+
+OPCIÓN A — Terminal (la más rápida, 30 segundos)
+  1. Abre la app Terminal (Cmd+Espacio, escribe "Terminal", Enter).
+  2. Escribe esto (con un espacio al final, SIN pulsar Enter todavía):
+         xattr -dr com.apple.quarantine 
+  3. Arrastra la carpeta "BodycamTactical-Mac-v3" desde el Finder a la ventana de Terminal
+     (se escribe sola la ruta) y pulsa Enter. No dice nada si funciona.
+  4. Ya puedes hacer doble clic en "Jugar Bodycam.command" normalmente.
+
+OPCIÓN B — Ajustes del Sistema
+  1. Haz doble clic en "Jugar Bodycam.command" (saldrá el aviso de bloqueo; pulsa "Aceptar" o "Listo").
+  2. Abre Ajustes del Sistema → Privacidad y seguridad.
+  3. Baja hasta el final: verás «Se ha bloqueado "Jugar Bodycam.command"…» → pulsa "Abrir igualmente"
+     y escribe tu contraseña del Mac.
+  4. Si después se bloquea el servidor ("bodycam-server-arm64"), repite los pasos 2–3 para él.
+
+¿Por qué pasa? El ZIP se descarga de Internet y macOS marca todo su contenido como "en cuarentena".
+El juego es un servidor local + página web: no instala nada ni pide permisos de red externos.
