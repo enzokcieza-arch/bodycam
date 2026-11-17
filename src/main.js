@@ -100,7 +100,9 @@ function sunFromHDRI(a) {
 // direccional, neblina oscura. La exposición nocturna y la atenuación de las sondas de GI (horneadas de día) se
 // aplican en NIGHT más abajo.
 const NIGHT = {
-  skyLum: 0.0065,      // luminancia media a la que se normaliza el cielo (unidades de escena; el día nublado ≈ 1)
+  skyLum: 0.0065,
+  bgK: 0.4,           // brillo del cielo VISIBLE relativo a la luz que aporta (en interiores oscuros la ganancia
+                      // del sensor lo subía a azul crepuscular)      // luminancia media a la que se normaliza el cielo (unidades de escena; el día nublado ≈ 1)
   envI: 0.9,          // intensidad del entorno (IBL) relativa a esa normalización
   moon: 0.28,         // intensidad de la luna (luz direccional con sombras)
   moonColor: 0x9db4dc,
@@ -126,7 +128,7 @@ async function yh() {
   const e = t.fromEquirectangular(a).texture;
   ((E.scene.environment = e),
     (E.scene.background = a),
-    (E.scene.backgroundIntensity = NIGHT.skyScale),
+    (E.scene.backgroundIntensity = NIGHT.skyScale * NIGHT.bgK),
     (E.scene.environmentIntensity = NIGHT.skyScale * NIGHT.envI),
     t.dispose());
   const m = sunFromHDRI(a).dir;

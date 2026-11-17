@@ -123,6 +123,13 @@ godrays, wetness, grime, emergency.
 - Rebote de la linterna sobre el arma y los brazos (dejan de ser una silueta negra).
 - Noche: luna 0.16 → 0.28, GI residual 3.5 % → 5 %, cielo más oscuro (sin negro absoluto en medio encuadre).
 
+### Puntos débiles (v3.4)
+- Arma: micro-detalle fotográfico con texturas PBR reales de Poly Haven ya incluidas (metal galvanizado en cajón y
+  cañón, madera envejecida en culata y guardamanos), proyectadas en triplanar sin UVs y con relieve por derivadas.
+- Arma y brazos de noche: rebote de la linterna ×4 y sin la oclusión diurna del viewmodel (×0.4 → ×0.85).
+- Linterna sin anillos dibujados en el cookie (se marcaban en las paredes); borde del hotspot suave.
+- Cielo visible separado de la luz que aporta (`bgK` 0.4): ya no se ve azul crepuscular en interiores oscuros.
+
 ### Pendiente
 - NPC/operadores y brazos/arma de alta calidad: los candidatos CC-BY están en Sketchfab (requiere token válido).
 - Sombras de contacto en brazos.

@@ -6,12 +6,17 @@ import {
 } from "../three.js";
 
 // ── desgaste procedural en espacio de objeto (posición de bind → estable aunque el arma se anime)
-const WEAR_VERT_PARS = /* glsl */ `varying vec3 vObjPos;\n`;
+const WEAR_VERT_PARS = /* glsl */ `varying vec3 vObjPos; varying vec3 vObjN;\n`;
 // luz de rebote sobre el arma y los brazos: la linterna ilumina lo que tiene delante y eso devuelve algo de luz
 // (sin esto, de noche el arma era una silueta negra). Lo actualiza updateGunFx cada frame.
 export const VM_BOUNCE = { value: 0 };
 const WEAR_FRAG_PARS = /* glsl */ `
-  varying vec3 vObjPos;
+  varying vec3 vObjPos; varying vec3 vObjN;
+  uniform sampler2D detailMap; uniform vec3 detailP;   // x = metros por repetición (unid. objeto), y = fuerza, z = relieve
+  vec3 detailTri(vec3 p, vec3 n){
+    vec3 w = pow(abs(n), vec3(4.0)); w /= (w.x + w.y + w.z);
+    return texture2D(detailMap, p.zy).rgb * w.x + texture2D(detailMap, p.xz).rgb * w.y + texture2D(detailMap, p.xy).rgb * w.z;
+  }
   uniform float wearScale; uniform vec4 wearAmt; uniform float vmBounce;   // x = arañazos, y = grasa/manchas, z = borde gastado, w = tejido
   float wh(vec3 p){ p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
   float wn(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
@@ -20,18 +25,30 @@ const WEAR_FRAG_PARS = /* glsl */ `
   float wfbm(vec3 p){ return 0.5 * wn(p) + 0.25 * wn(p * 2.03) + 0.125 * wn(p * 4.01) + 0.0625 * wn(p * 8.1); }
 `;
 
-function addWear(mat, { scale = 60, scratches = 0, grease = 0, edge = 0, weave = 0 } = {}) {
+function addWear(mat, { scale = 60, scratches = 0, grease = 0, edge = 0, weave = 0, detail = null } = {}) {
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.wearScale = { value: scale };
     sh.uniforms.vmBounce = VM_BOUNCE;
+    sh.uniforms.detailMap = { value: detail?.map || null };
+    sh.uniforms.detailP = { value: new Vector3(detail?.tile || 1, detail ? detail.k : 0, detail?.bump || 0) };
     sh.uniforms.wearAmt = { value: new Vector4(scratches, grease, edge, weave) };
     sh.vertexShader = sh.vertexShader
       .replace("#include <common>", "#include <common>\n" + WEAR_VERT_PARS)
-      .replace("#include <begin_vertex>", "#include <begin_vertex>\n  vObjPos = position;");
+      .replace("#include <begin_vertex>", "#include <begin_vertex>\n  vObjPos = position; vObjN = normal;");
     sh.fragmentShader = sh.fragmentShader
       .replace("#include <common>", "#include <common>\n" + WEAR_FRAG_PARS)
       .replace("#include <emissivemap_fragment>", "#include <emissivemap_fragment>\n  totalEmissiveRadiance += diffuseColor.rgb * vmBounce * (0.55 + 0.45 * max(0.0, -normalize(vNormal).z));")
       .replace("#include <normal_fragment_maps>", /* glsl */ `#include <normal_fragment_maps>
+        // micro-relieve de la textura real (luminancia como altura), por derivadas de pantalla
+        if (detailP.y > 0.0 && detailP.z > 0.0) {
+          vec3 dt = detailTri(vObjPos / detailP.x, normalize(vObjN));
+          float hh = dot(dt, vec3(0.33));
+          vec3 dpx = dFdx(-vViewPosition), dpy = dFdy(-vViewPosition);
+          vec3 r1 = cross(dpy, normal), r2 = cross(normal, dpx);
+          float det = dot(dpx, r1);
+          vec3 grad = sign(det) * (dFdx(hh) * r1 + dFdy(hh) * r2);
+          normal = normalize(abs(det) * normal - grad * detailP.z);
+        }
         // pliegues de tela / costuras (solo materiales con trama): bump procedural por derivadas de pantalla
         if (wearAmt.w > 0.0) {
           vec3 fp = vObjPos * wearScale * 0.035;
@@ -47,6 +64,13 @@ function addWear(mat, { scale = 60, scratches = 0, grease = 0, edge = 0, weave =
       .replace("#include <roughnessmap_fragment>", /* glsl */ `#include <roughnessmap_fragment>
         {
           vec3 wp = vObjPos * wearScale;
+          // detalle fotográfico (textura PBR real de Poly Haven) proyectado sin UVs
+          if (detailP.y > 0.0) {
+            vec3 dt = detailTri(vObjPos / detailP.x, normalize(vObjN));
+            float dl = dot(dt, vec3(0.2126, 0.7152, 0.0722));
+            diffuseColor.rgb *= mix(vec3(1.0), dt / max(0.32, 0.001) * 0.9, detailP.y);
+            roughnessFactor = clamp(roughnessFactor + (0.4 - dl) * 0.5 * detailP.y, 0.06, 1.0);
+          }
           float big = wfbm(wp * 0.35);                                  // manchas grandes de grasa / manoseo
           float fine = wfbm(wp * 3.0);
           // arañazos: ruido muy estirado a lo largo del arma
@@ -64,7 +88,7 @@ function addWear(mat, { scale = 60, scratches = 0, grease = 0, edge = 0, weave =
           }
         }`);
   };
-  mat.customProgramCacheKey = () => `wear3|${scratches}|${grease}|${edge}|${weave}|${scale}`;
+  mat.customProgramCacheKey = () => `wear4|${detail ? 1 : 0}|${scratches}|${grease}|${edge}|${weave}|${scale}`;
   mat.needsUpdate = true;
 }
 
@@ -81,19 +105,15 @@ function makeTorchCookie() {
   gr.addColorStop(0.10, "rgb(255,252,246)");
   gr.addColorStop(0.20, "rgb(200,196,188)");
   gr.addColorStop(0.30, "rgb(120,118,112)");
-  gr.addColorStop(0.36, "rgb(92,90,86)");       // anillo del reflector (borde del hotspot)
+  gr.addColorStop(0.36, "rgb(88,86,82)");       // borde del hotspot (suave)
   gr.addColorStop(0.44, "rgb(62,61,58)");
   gr.addColorStop(0.75, "rgb(46,45,44)");       // meseta del derrame
   gr.addColorStop(0.93, "rgb(30,30,29)");
   gr.addColorStop(1.0, "rgb(0,0,0)");
   g.fillStyle = gr; g.fillRect(0, 0, 256, 256);
-  // imperfecciones: sombra del LED y anillos finos
+  // imperfección: sombra tenue del LED (los anillos dibujados se marcaban demasiado en las paredes)
   g.globalCompositeOperation = "multiply";
-  for (let i = 0; i < 2; i++) {
-    g.strokeStyle = `rgba(${236 + i * 6},${236 + i * 6},${236 + i * 6},1)`;
-    g.lineWidth = 1.5; g.beginPath(); g.arc(128 + (i % 2 ? 2 : -2), 128, 30 + i * 17, 0, 6.2832); g.stroke();
-  }
-  g.fillStyle = "rgba(170,170,170,1)"; g.fillRect(124, 122, 8, 12);
+  g.fillStyle = "rgba(215,215,215,1)"; g.fillRect(124, 122, 8, 12);
   const t = new CanvasTexture(c);
   t.colorSpace = SRGBColorSpace; t.minFilter = t.magFilter = LinearFilter; t.generateMipmaps = false;
   return t;
@@ -184,14 +204,23 @@ function measureGun(vm) {
 
 export function enhanceViewmodel(vm, engine, opts = {}) {
   const out = {};
+  // textura de detalle desde el manifest (ya en los assets; CC0)
+  const det = (name, tile, k, bump) => {
+    const t = vm.assets?.manifest?.textures?.[name];
+    if (!t) return null;
+    const map = vm.assets.texture(t.diff, true);
+    map.wrapS = map.wrapT = 1000;   // RepeatWrapping
+    map.needsUpdate = true;
+    return { map, tile, k, bump };
+  };
   // 1) materiales
   vm.model.traverse((m) => {
     if (!m.isMesh || !m.material) return;
     const mat = m.material;
     switch (mat.name) {
-      case "ak_receiver": mat.color.setHex(0x232527); mat.roughness = 0.44; mat.metalness = 0.82; addWear(mat, { scale: 70, scratches: 1, grease: 1, edge: 0.75 }); break;
-      case "ak_steel": mat.color.setHex(0x1a1b1d); mat.roughness = 0.36; mat.metalness = 0.9; addWear(mat, { scale: 70, scratches: 1.2, grease: 0.8, edge: 1 }); break;
-      case "ak_wood": mat.color.setHex(0x4a2c18); mat.roughness = 0.52; addWear(mat, { scale: 38, scratches: 0.5, grease: 1.2, edge: 0.25 }); break;
+      case "ak_receiver": mat.color.setHex(0x26282b); mat.roughness = 0.44; mat.metalness = 0.82; addWear(mat, { scale: 70, scratches: 1, grease: 1, edge: 0.75, detail: det("metal_galv", 1.2, 0.55, 0.012) }); break;
+      case "ak_steel": mat.color.setHex(0x1c1d1f); mat.roughness = 0.36; mat.metalness = 0.9; addWear(mat, { scale: 70, scratches: 1.2, grease: 0.8, edge: 1, detail: det("metal_galv", 1.0, 0.45, 0.01) }); break;
+      case "ak_wood": mat.color.setHex(0x5a3520); mat.roughness = 0.5; addWear(mat, { scale: 38, scratches: 0.5, grease: 1.2, edge: 0.25, detail: det("wood_weathered", 1.8, 0.85, 0.018) }); break;
       case "sleeve": mat.color.setHex(0x30343a); mat.roughness = 0.95; addWear(mat, { scale: 85, weave: 1, grease: 0.6 }); break;
       case "glove": mat.color.setHex(0x17181a); mat.roughness = 0.62; addWear(mat, { scale: 95, weave: 0.55, grease: 1.1, edge: 0.3 }); break;
     }
@@ -245,7 +274,7 @@ export function enhanceViewmodel(vm, engine, opts = {}) {
 // por frame: eje del arma en espacio de vista para el punto colimado
 const _a = new Vector3(), _b = new Vector3();
 export function updateGunFx(fx, vm, camera) {
-  VM_BOUNCE.value += ((vm.torch && vm.torch.intensity > 0.5 ? 0.012 : 0.0015) - VM_BOUNCE.value) * 0.2;
+  VM_BOUNCE.value += ((vm.torch && vm.torch.intensity > 0.5 ? 0.05 : 0.004) - VM_BOUNCE.value) * 0.2;
   if (!fx?.redDot) return;
   vm.gunOff.getWorldPosition(_a);
   _b.set(0, 0, -1).transformDirection(vm.gunOff.matrixWorld);

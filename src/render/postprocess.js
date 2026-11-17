@@ -477,6 +477,8 @@ class Er {
     this.adaptMat.uniforms.expRange.value.set(0.25, N.maxExp);
     this.atmo.sunCol.set(0.35, 0.42, 0.6).multiplyScalar(N.moon);
     this.night = N;
+    // de día el cuerpo le tapa medio cielo al arma (×0.4); de noche la luz viene de la linterna y las luces locales
+    this.params.viewmodelOcclusion = 0.85;
   }
   // acumulación temporal de un buffer ruidoso (ver render/temporal.js); devuelve la textura resuelta
   temporal(cur, hist, depth, key) {
