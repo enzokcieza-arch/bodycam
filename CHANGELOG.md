@@ -130,6 +130,11 @@ godrays, wetness, grime, emergency.
 - Linterna sin anillos dibujados en el cookie (se marcaban en las paredes); borde del hotspot suave.
 - Cielo visible separado de la luz que aporta (`bgK` 0.4): ya no se ve azul crepuscular en interiores oscuros.
 
+### Pose de apuntado (v3.5)
+- Con la mira red-dot se apunta a través de ella: arma recta y centro de la lente en el eje de la cámara a 24 cm
+  del ojo (error < 1 mm), calculado midiendo la lente en espacio de cámara (`tools/adsalign.mjs`). La pose
+  canteada de v2.5 tapaba media pantalla. Con `?noreddot` se conserva la pose de miras de hierro.
+
 ### Pendiente
 - NPC/operadores y brazos/arma de alta calidad: los candidatos CC-BY están en Sketchfab (requiere token válido).
 - Sombras de contacto en brazos.

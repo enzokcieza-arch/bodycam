@@ -186,6 +186,9 @@ async function xh() {
     (us(0.7, "Arma y brazos…"),
       (le = await new Nc(E, Ge).load()),
       (gfx = enhanceViewmodel(le, E, { redDot: !Xa.has("noreddot") })),
+      // v3.4: con la mira red-dot se apunta A TRAVÉS de ella: arma recta y centro de la lente en el eje de la
+      // cámara a 24 cm del ojo (medido con tools/adsalign.mjs). La pose canteada de v2.5 tapaba media pantalla.
+      gfx.redDot && ((ne.ads.p = [-0.0065, 0.006, 0.104]), (ne.ads.r = [-0.034, 0.018, 0])),
       (le.torchOn = !0),
       (xt = new Xc(E, ue, Be)),
       (xt.smokeLights = { torch: le.torch, extra: [le.flashLight] }),
